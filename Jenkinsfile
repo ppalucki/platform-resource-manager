@@ -2,7 +2,7 @@ pipeline {
     agent any
     stages {
         stage("Run flake8 on PRM") {
-            streps {
+            steps {
                 sh'''
                 cd prm
                 tox -e flake8
