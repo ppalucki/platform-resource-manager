@@ -1,4 +1,4 @@
-pipeliene {
+pipeline {
     agent any
     stages {
         stage("Run flake8 on PRM") {
