@@ -55,8 +55,8 @@ pipeline {
         stage("Run LLC experiment") {
             agent {
                 docker {
-                    image 'owca/aurora-cli:env.GIT_COMMIT'
-                    registryUrl 'http://env.DOCKER_REPOSITORY_URL'
+                    image "owca/aurora-cli:${GIT_COMMIT}"
+                    registryUrl "http://${DOCKER_REPOSITORY_URL}"
                 }
             }
             steps {
