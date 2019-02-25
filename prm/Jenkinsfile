@@ -6,7 +6,7 @@ pipeline {
         INVENTORY = credentials('inventory.yml')
         PRM_SUT = credentials('PRM_SUT')
 
-
+        DEFAULT_LOCAL_TMP="/tmp/ansible/${GIT_COMMIT}"
         PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
         DEFAULT_INVENTORY='/prm/inventory.yaml'
         LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
