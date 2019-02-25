@@ -9,6 +9,7 @@ pipeline {
         ANSIBLE_ANY_ERRORS_FATAL='True'
         ANSIBLE_INVENTORY_UNPARSED_FAILED='True'
         ANSIBLE_LOCAL_TMP='/tmp/ansible'
+        ANSIBLE_REMOTE_TMP='/tmp/ansible-remote'
         PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
         DEFAULT_INVENTORY='/prm/inventory.yaml'
         LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
