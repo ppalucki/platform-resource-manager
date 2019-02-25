@@ -6,4 +6,5 @@ RUN sha512sum -c aurora-tools-0.20.0-1.el7.centos.aurora.x86_64.rpm.sha512
 RUN yum install -y aurora-tools-0.20.0-1.el7.centos.aurora.x86_64.rpm
 
 ADD . /prm
-ENV AURORA_CONFIG_ROOT /prm/clusters.json
+RUN mkdir /etc/aurora
+ADD clusters.json /etc/aurora/clusters.json
