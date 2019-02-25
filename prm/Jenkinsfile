@@ -26,7 +26,7 @@ pipeline {
                 }
             }
         }
-        stege("Build aurora-cli Docker image") {
+        stage("Build aurora-cli Docker image") {
             steps {
                 sh '''
                 IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/aurora-cli:${GIT_COMMIT}
