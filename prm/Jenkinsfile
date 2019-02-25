@@ -56,7 +56,7 @@ pipeline {
             agent {
                 docker {
                     image 'owca/aurora-cli:env.GIT_COMMIT'
-                    registryUrl env.DOCKER_REPOSITORY_URL
+                    registryUrl 'http://env.DOCKER_REPOSITORY_URL'
                 }
             }
             steps {
