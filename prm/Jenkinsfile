@@ -8,8 +8,8 @@ pipeline {
 
         ANSIBLE_ANY_ERRORS_FATAL='True'
         ANSIBLE_INVENTORY_UNPARSED_FAILED='True'
-        ANSIBLE_LOCAL_TMP='/tmp/ansible-local'
-        ANSIBLE_REMOTE_TMP='/tmp/ansible-remote'
+        ANSIBLE_LOCAL_TEMP='/tmp/ansible-local'
+        ANSIBLE_REMOTE_TEMP='/tmp/ansible-remote'
         PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
         DEFAULT_INVENTORY='/prm/inventory.yaml'
         LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
@@ -67,16 +67,13 @@ pipeline {
             }
             steps {
                 sh '''
-                env
-                mkdir -p ${ANSIBLE_LOCAL_TMP}
-                mkdir -p ${ANSIBLE_REMOTE_TMP}
-                ansible-playbook -vvv -e local_tmp=/tmp/ansible-local -e remote_tmp=/tmp/ansible-remote -l ${PRM_SUT} -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
                 '''
             }
             post {
                 always {
                     sh '''
-                    ansible-playbook -vvv -e local_tmp=/tmp/ansible-local -e remote_tmp=/tmp/ansible-remote -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=clean_jobs -v
+                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=clean_jobs -v
                     '''
                 }
             }
