@@ -3,7 +3,7 @@ FROM centos:7.6.1810
 RUN curl -L --silent -o aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm https://apache.bintray.com/aurora/centos-7/aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm
 RUN curl -L --silent -o aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm.sha https://apache.bintray.com/aurora/centos-7/aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm.sha
 RUN sha1sum -c aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm.sha
-RUN yum install -y aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm
+RUN yum install -y aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm ansible
 
 ADD . /prm
 ADD clusters.json /etc/aurora/clusters.json
