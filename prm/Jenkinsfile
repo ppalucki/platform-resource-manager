@@ -7,7 +7,8 @@ pipeline {
         PRM_SUT = credentials('PRM_SUT')
 
         ANSIBLE_ANY_ERRORS_FATAL='True'
-        ANSIBLE_DEFAULT_LOCAL_TMP="/tmp/ansible"
+        ANSIBLE_INVENTORY_UNPARSED_FAILED='True'
+        ANSIBLE_LOCAL_TMP='/tmp/ansible'
         PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
         DEFAULT_INVENTORY='/prm/inventory.yaml'
         LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
