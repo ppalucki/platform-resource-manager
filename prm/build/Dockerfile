@@ -5,7 +5,7 @@ RUN curl -L --silent -o aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm.sha h
 RUN sha1sum -c aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm.sha
 RUN yum install -y aurora-tools-0.18.0-1.el7.centos.aurora.x86_64.rpm
 # Ansible 2.5 fails in some container environments
-RUN yum install -y centos-release-scl && yum makecache --fast && yum install -y centos-release-ansible26
+RUN yum install -y centos-release-scl && yum makecache && yum install -y centos-release-ansible26
 RUN yum makecache && yum install -y ansible
 
 ADD . /prm
