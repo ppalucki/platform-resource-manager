@@ -4,9 +4,9 @@ pipeline {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
         AURORA_CLI_CONFIGURATION = credentials('clusters.json')
         INVENTORY = credentials('inventory.yml')
-        DEFAULT_PLAYBOOK=/prm/owca/workloads/run_workloads.yaml
-        DEFAULT_INVENTORY=/prm/inventory.yaml
-        LLC_INVENTORY=/prm/demo_scenarios/complex_llc.0/inventory.yaml
+        DEFAULT_PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
+        DEFAULT_INVENTORY='/prm/inventory.yaml'
+        LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
     }
     stages {
         stage("Run flake8 on PRM") {
