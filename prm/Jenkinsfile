@@ -68,6 +68,8 @@ pipeline {
             steps {
                 sh '''
                 env
+                mkdir -p ${ANSIBLE_LOCAL_TMP}
+                mkdir -p ${ANSIBLE_REMOTE_TMP}
                 ansible-playbook -vvv -e local_tmp=/tmp/ansible-local -e remote_tmp=/tmp/ansible-remote -l ${PRM_SUT} -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
                 '''
             }
