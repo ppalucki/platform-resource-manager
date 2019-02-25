@@ -68,13 +68,13 @@ pipeline {
             steps {
                 sh '''
                 env
-                ansible-playbook -vvv -e default_local_tmp=/tmp/ansible-local -e default_remote_tmp=/tmp/ansible-remote -l ${PRM_SUT} -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
+                ansible-playbook -vvv -e local_tmp=/tmp/ansible-local -e remote_tmp=/tmp/ansible-remote -l ${PRM_SUT} -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
                 '''
             }
             post {
                 always {
                     sh '''
-                    ansible-playbook -vvv -e default_local_tmp=/tmp/ansible-local -e default_remote_tmp=/tmp/ansible-remote -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=clean_jobs -v
+                    ansible-playbook -vvv -e local_tmp=/tmp/ansible-local -e remote_tmp=/tmp/ansible-remote -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=clean_jobs -v
                     '''
                 }
             }
