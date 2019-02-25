@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
+        AURORA_CLI_CONFIGURATION = credentials('clusters.json')
     }
     stages {
         stage("Run flake8 on PRM") {
@@ -32,10 +33,18 @@ pipeline {
         stage("Build aurora-cli Docker image") {
             steps {
                 sh '''
+                cp ${AURORA_CLI_CONFIGURATION} ${WORKSPACE}/prm/clusters.json
                 IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/aurora-cli:${GIT_COMMIT}
                 docker build -t ${IMAGE_NAME} -f ${WORKSPACE}/prm/build/Dockerfile ${WORKSPACE}/prm
                 docker push ${IMAGE_NAME}
                 '''
+            }
+            post {
+                always {
+                    sh '''
+                    rm -fr ${WORKSPACE}/prm/clusters.json
+                    '''
+                }
             }
         }
     }
