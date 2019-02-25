@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
+    }
     stages {
         stage("Run flake8 on PRM") {
             steps {
