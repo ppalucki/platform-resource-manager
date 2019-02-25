@@ -4,6 +4,8 @@ pipeline {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
         AURORA_CLI_CONFIGURATION = credentials('clusters.json')
         INVENTORY = credentials('inventory.yml')
+        PRM_SUT = credentials('PRM_SUT')
+
 
         PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
         DEFAULT_INVENTORY='/prm/inventory.yaml'
@@ -62,14 +64,13 @@ pipeline {
             }
             steps {
                 sh '''
-                ansible-playbook -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
+                ansible-playbook -l ${PRM_SUT} -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
                 '''
             }
             post {
                 always {
                     sh '''
-                    aurora job list example | xargs aurora job killall
-                    ansible-playbook -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=clean_jobs -v
+                    ansible-playbook -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=clean_jobs -v
                     '''
                 }
             }
