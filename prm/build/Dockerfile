@@ -12,3 +12,4 @@ RUN pip install ansible
 
 ADD . /prm
 ADD clusters.json /etc/aurora/clusters.json
+ADD build/ansible.cfg /etc/ansible/ansible.cfg
