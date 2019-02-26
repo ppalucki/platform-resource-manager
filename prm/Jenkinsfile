@@ -63,6 +63,10 @@ pipeline {
             }
             steps {
                 sh '''
+                env
+                ansible-playbook --version
+                python --version
+                hostname
                 ansible-playbook -vvv -l ${PRM_SUT} -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
                 '''
             }
