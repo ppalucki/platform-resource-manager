@@ -57,7 +57,7 @@ pipeline {
         stage("Run LLC experiment") {
             agent {
                 docker {
-                    image "owca/aurora-cli:debug"
+                    image "owca/aurora-cli:debug-2"
                     registryUrl "http://${DOCKER_REPOSITORY_URL}"
                 }
             }
