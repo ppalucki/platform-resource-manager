@@ -7,7 +7,6 @@ pipeline {
         PRM_SUT = credentials('PRM_SUT')
 
         PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
-        DEFAULT_INVENTORY='/etc/ansible/inventory.yaml'
         LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
     }
     stages {
