@@ -7,7 +7,7 @@ pipeline {
         PRM_SUT = credentials('PRM_SUT')
 
         PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
-        DEFAULT_INVENTORY='/prm/inventory.yaml'
+        DEFAULT_INVENTORY='/etc/ansible/inventory.yaml'
         LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
     }
     stages {
@@ -39,18 +39,17 @@ pipeline {
         stage("Build aurora-cli Docker image") {
             steps {
                 sh '''
-                cp ${AURORA_CLI_CONFIGURATION} ${WORKSPACE}/prm/clusters.json
-                cp ${INVENTORY} ${WORKSPACE}/prm/inventory.yaml
-                chmod 644 ${WORKSPACE}/prm/inventory.yaml
+                cp ${AURORA_CLI_CONFIGURATION} ${WORKSPACE}/clusters.json
+                cp ${INVENTORY} ${WORKSPACE}/inventory.yaml
                 IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/aurora-cli:${GIT_COMMIT}
-                docker build -t ${IMAGE_NAME} -f ${WORKSPACE}/prm/build/Dockerfile ${WORKSPACE}/prm
+                docker build -t ${IMAGE_NAME} -f ${WORKSPACE}/prm/build/Dockerfile ${WORKSPACE}
                 docker push ${IMAGE_NAME}
                 '''
             }
             post {
                 always {
                     sh '''
-                    rm -fr ${WORKSPACE}/prm/clusters.json ${WORKSPACE}/prm/inventory.yaml
+                    rm -fr ${WORKSPACE}/clusters.json ${WORKSPACE}/inventory.yaml
                     '''
                 }
             }
@@ -64,10 +63,6 @@ pipeline {
             }
             steps {
                 sh '''
-                ls -la /prm
-                echo $UID
-                ps aux
-                hostname
                 ansible-playbook -vvv -l ${PRM_SUT} -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
                 '''
             }

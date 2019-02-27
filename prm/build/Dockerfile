@@ -10,6 +10,7 @@ RUN pip install ansible
 #RUN yum install -y centos-release-scl && yum makecache && yum install -y centos-release-ansible26
 #RUN yum makecache && yum install -y ansible
 
-ADD . /prm
+ADD prm /prm
 ADD clusters.json /etc/aurora/clusters.json
 ADD build/ansible.cfg /etc/ansible/ansible.cfg
+ADD inventory.yaml /etc/ansible/inventory.yaml
