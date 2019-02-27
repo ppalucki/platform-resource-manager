@@ -41,6 +41,9 @@ pipeline {
                 mkdir -p ${HOME}/.aurora
                 cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
                 ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
+                sleep 600
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=cassandra_stress--stress
+                sleep 300
                 '''
             }
             post {
