@@ -14,5 +14,6 @@ ADD prm /prm
 ADD clusters.json /etc/aurora/clusters.json
 ADD prm/build/ansible.cfg /etc/ansible/ansible.cfg
 ADD inventory.yaml /etc/ansible/inventory.yaml
+RUN chmod 644 /etc/ansible/inventory.yaml
 
 RUN mkdir -p /tmp/ansible-local /tmp/ansible-remote && chmod 777 /tmp/ansible-local /tmp/ansible-remote
