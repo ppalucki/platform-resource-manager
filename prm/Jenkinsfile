@@ -3,7 +3,7 @@ pipeline {
     environment {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
         AURORA_CLI_CONFIGURATION = credentials('clusters.json')
-        INVENTORY = credentials('inventory.yml')
+        DEFAULT_INVENTORY = credentials('inventory.yml')
         PRM_SUT = credentials('PRM_SUT')
 
         PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
@@ -36,40 +36,19 @@ pipeline {
                 }
             }
         }
-        stage("Build aurora-cli Docker image") {
-            steps {
-                sh '''
-                cp ${AURORA_CLI_CONFIGURATION} ${WORKSPACE}/clusters.json
-                cp ${INVENTORY} ${WORKSPACE}/inventory.yaml
-                IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/aurora-cli:${GIT_COMMIT}
-                docker build -t ${IMAGE_NAME} -f ${WORKSPACE}/prm/build/Dockerfile ${WORKSPACE}
-                docker push ${IMAGE_NAME}
-                '''
-            }
-            post {
-                always {
-                    sh '''
-                    rm -fr ${WORKSPACE}/clusters.json ${WORKSPACE}/inventory.yaml
-                    '''
-                }
-            }
-        }
         stage("Run LLC experiment") {
-            agent {
-                docker {
-                    image "owca/aurora-cli:${GIT_COMMIT}"
-                    registryUrl "http://${DOCKER_REPOSITORY_URL}"
-                }
-            }
             steps {
                 sh '''
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
+                mkdir -p ${HOME}/.aurora
+                cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
                 '''
             }
             post {
                 always {
                     sh '''
-                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} ${PLAYBOOK} --tags=clean_jobs
+                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=clean_jobs
+                    rm -fr ${HOME}/.aurora/
                     '''
                 }
             }
