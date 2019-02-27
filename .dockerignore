@@ -1,3 +1,4 @@
-.tox
-.pex-build
-prm.egg-info
+prm/.tox
+prm/.pex-build
+prm/prm.egg-info
+prm/dist
