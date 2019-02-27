@@ -12,5 +12,5 @@ RUN pip install ansible
 
 ADD prm /prm
 ADD clusters.json /etc/aurora/clusters.json
-ADD build/ansible.cfg /etc/ansible/ansible.cfg
+ADD prm/build/ansible.cfg /etc/ansible/ansible.cfg
 ADD inventory.yaml /etc/ansible/inventory.yaml
