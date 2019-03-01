@@ -12,6 +12,10 @@ pipeline {
 
         labels="{\"build_number\": ${BUILD_NUMBER}, \"build_node_name\": \"${NODE_NAME}\", \"build_commit\": \"${GIT_COMMIT}\"}"
     }
+    options {
+        disableConcurrentBuilds()
+        timeout(time: 75, unit: 'MINUTES')
+    }
     stages {
         stage("Run flake8 on PRM") {
             steps {
