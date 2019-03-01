@@ -8,6 +8,7 @@ pipeline {
 
         PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
         LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
+        MEMBW_INVENTORY='demo_scenarios/complex_mbw.0/inventory.yaml'
     }
     stages {
         stage("Run flake8 on PRM") {
@@ -43,6 +44,26 @@ pipeline {
                 ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
                 sleep 600
                 ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=cassandra_stress--stress
+                sleep 300
+                '''
+            }
+            post {
+                always {
+                    sh '''
+                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=clean_jobs
+                    rm -fr ${HOME}/.aurora/
+                    '''
+                }
+            }
+        }
+        stage("Run Memory Bandwidth experiment") {
+            steps {
+                sh '''
+                mkdir -p ${HOME}/.aurora
+                cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress
+                sleep 1800
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=tensorflow_benchmark_prediction
                 sleep 300
                 '''
             }
