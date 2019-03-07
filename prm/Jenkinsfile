@@ -56,9 +56,9 @@ pipeline {
                 sh '''
                 mkdir -p ${HOME}/.aurora
                 cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e '${LLC_LABELS}' ${WORKSPACE}${PLAYBOOK}
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}${PLAYBOOK}
                 sleep 600
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=cassandra_stress--stress -e '${LLC_LABELS}' ${WORKSPACE}${PLAYBOOK}
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}${PLAYBOOK}
                 sleep 300
                 '''
             }
@@ -76,9 +76,9 @@ pipeline {
                 sh '''
                 mkdir -p ${HOME}/.aurora
                 cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e '${MBW_LABELS}' ${WORKSPACE}${PLAYBOOK}
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}${PLAYBOOK}
                 sleep 1800
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=tensorflow_benchmark_prediction -e '${MBW_LABELS}' ${WORKSPACE}${PLAYBOOK}
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=tensorflow_benchmark_prediction -e "${MBW_LABELS}" ${WORKSPACE}${PLAYBOOK}
                 sleep 300
                 '''
             }
