@@ -10,7 +10,8 @@ pipeline {
         LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
         MEMBW_INVENTORY='/prm/demo_scenarios/complex_mbw.0/inventory.yaml'
 
-        labels="{\"build_number\": ${BUILD_NUMBER}, \"build_node_name\": \"${NODE_NAME}\", \"build_commit\": \"${GIT_COMMIT}\"}"
+        LLC_LABELS="{additional_labels: {build_number: ${BUILD_NUMBER}, build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: "complex_llc.0"}}"
+        MBW_LABELS="{additional_labels: {build_number: ${BUILD_NUMBER}, build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: "complex_llc.0"}}"
     }
     options {
         disableConcurrentBuilds()
@@ -55,9 +56,9 @@ pipeline {
                 sh '''
                 mkdir -p ${HOME}/.aurora
                 cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e ${LLC_LABELS}
                 sleep 600
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=cassandra_stress--stress
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=cassandra_stress--stress -e ${LLC_LABELS}
                 sleep 300
                 '''
             }
@@ -75,9 +76,9 @@ pipeline {
                 sh '''
                 mkdir -p ${HOME}/.aurora
                 cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e ${MBW_LABELS}
                 sleep 1800
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=tensorflow_benchmark_prediction
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} ${WORKSPACE}${PLAYBOOK} --tags=tensorflow_benchmark_prediction -e ${MBW_LABELS}
                 sleep 300
                 '''
             }
