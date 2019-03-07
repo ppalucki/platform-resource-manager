@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh'''
                 cd prm
-                tox -e flake8
+                tox -r -e flake8
                 '''
             }
         }
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 sh'''
                 cd prm
-                tox -e unit
+                tox -r -e unit
                 '''
             }
         }
@@ -37,7 +37,7 @@ pipeline {
             steps {
                 sh'''
                 cd prm
-                tox -e package
+                tox -r -e package
                 '''
                 stash(name: "owca-prm", includes: "prm/dist/**")
                 archiveArtifacts(artifacts: "prm/dist/**")
