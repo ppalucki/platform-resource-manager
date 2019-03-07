@@ -17,6 +17,9 @@
 
 from requests import get
 
+_PROMETHEUS_QUERY_PATH = "/api/v1/query"
+_PROMETHEUS_URL_TPL = '{prometheus}{path}?query={name}{{build_number="{build_number}"}}'
+
 
 def build_prometheus_url(prometheus, name, build_number):
     url = _PROMETHEUS_URL_TPL.format(
@@ -36,7 +39,3 @@ def fetch_metrics(url):
 
 def _parse_anomalies():
     pass
-
-
-_PROMETHEUS_QUERY_PATH = "/api/v1/query"
-_PROMETHEUS_URL_TPL = '{prometheus}{path}?query={name}{{build_number="{build_number}"}}'
