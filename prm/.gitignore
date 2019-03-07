@@ -6,3 +6,4 @@
 /prm.egg-info
 /.pex-cache
 /.pex-build
+/.coverage

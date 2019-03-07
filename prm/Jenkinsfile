@@ -25,6 +25,14 @@ pipeline {
                 '''
             }
         }
+        stage("Run PRM unit tests") {
+            steps {
+                sh'''
+                cd prm
+                tox -e unit
+                '''
+            }
+        }
         stage("Build owca-prm.pex") {
             steps {
                 sh'''

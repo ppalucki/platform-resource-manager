@@ -21,6 +21,9 @@ confluent-kafka = "==0.11.4"
 pex = "==1.5.1"
 tox = "==3.5.2"
 pytest = "==4.3.0"
+requests = "==2.21.0"
+pytest-cov = "==2.6.1"
+flake8 = "==3.6.0"
 
 [requires]
 python_version = "3.6"
