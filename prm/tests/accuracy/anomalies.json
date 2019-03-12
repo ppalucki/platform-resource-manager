@@ -1,0 +1,76 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "matrix",
+    "result": [
+      {
+        "metric": {
+          "__name__": "anomaly",
+          "application": "twemcache",
+          "application_version_name": "big",
+          "aurora_tier": "preemptible",
+          "build_number": "76",
+          "contended_task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-7131e87d-3582-4d03-bf57-47b097c9378c",
+          "contending_task_id": "root-staging14-cassandra_stress-default--cassandra--9142-0-0-0bad0893-1ada-40a7-8d91-b55657986e6a",
+          "resource": "thermal design power",
+          "task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-7131e87d-3582-4d03-bf57-47b097c9378c",
+          "type": "contention",
+          "workload_name": "twemcache_mutilate",
+          "workload_version_name": "big"
+        },
+        "values": [
+          [
+            1551978034.343,
+            "1"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "anomaly",
+          "application": "twemcache",
+          "application_host_ip": "100.64.176.14",
+          "application_version_name": "big",
+          "aurora_tier": "preemptible",
+          "build_commit": "e08dfd084c734238aae399ea4e445ad750af3fad",
+          "build_node_name": "100.64.176.16",
+          "build_number": "76",
+          "contended_task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-7131e87d-3582-4d03-bf57-47b097c9378c",
+          "contending_task_id": "root-staging14-redis_rpc_perf-default--redis--6790-0-0-bb7c2dde-027e-4bd8-a4bd-59f8fa6d6042",
+          "cores": "28",
+          "cpus": "56",
+          "env_uniq_id": "14",
+          "host": "igk-0106",
+          "instance": "127.0.0.1:9099",
+          "job": "owca_anomalies",
+          "job_name": "twemcache_mutilate.big--twemcache--11213.0",
+          "job_uniq_id": "11213",
+          "load_generator": "mutilate",
+          "load_generator_host_ip": "100.64.176.16",
+          "name": "twemcache_mutilate.big--twemcache--11213.0",
+          "owca_version": "0.1.dev229+g50af833",
+          "own_ip": "100.64.176.14",
+          "replica_index": "0",
+          "resource": "thermal design power",
+          "scenario": "complex_llc.0",
+          "sockets": "2",
+          "task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-7131e87d-3582-4d03-bf57-47b097c9378c",
+          "type": "contention",
+          "uuid": "6e22546f-5e79-6ab8-bdd6-8990de906d13",
+          "workload_name": "twemcache_mutilate",
+          "workload_version_name": "big"
+        },
+        "values": [
+          [
+            1551977782.386,
+            "1"
+          ],
+          [
+            1551978060.110,
+            "1"
+          ]
+        ]
+      }
+    ]
+  }
+}

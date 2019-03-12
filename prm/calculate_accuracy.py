@@ -17,7 +17,7 @@
 
 from argparse import ArgumentParser
 
-from prm.accuracy import build_prometheus_url, fetch_metrics
+from prm.accuracy import build_prometheus_url, fetch_metrics, calculate_components, calculate_precision_and_recall
 
 
 def main():
@@ -26,9 +26,14 @@ def main():
                         metavar='BUILD_NUMBER')
     parser.add_argument('--prometheus', type=str, default="http://127.0.0.1:9090",
                         help="Prometheus server base URL, eg: http://127.0.0.1:9090")
+    parser.add_argument('--window-size', type=float, default=10.0,
+                        help="Size of time window used to find SLO violations for each anomaly")
     args = parser.parse_args()
+
     url = build_prometheus_url(args.prometheus, 'anomaly', args.build_number)
     anomalies = fetch_metrics(url)
+    true_positives, anomaly_count, slo_violations = calculate_components(anomalies)
+    precision, recall = calculate_precision_and_recall(true_positives, anomaly_count, slo_violations)
 
 
 if __name__ == "__main__":
