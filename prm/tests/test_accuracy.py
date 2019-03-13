@@ -60,11 +60,14 @@ def _dict_from_json(path):
                 ],
                 [
                     [('irrelevant', 'sli>slo', 1),
-                     {"window_size": 10, "event_time": 1551978034.343}],
+                     {"window_size": 10, "event_time": 1552484541.644,
+                      "tags": {"workload_instance": "cassandra_stress--default--14--9142"}}],
                     [('irrelevant', 'sli>slo', 1),
-                     {"window_size": 10, "event_time": 1551977782.386}],
+                     {"window_size": 10, "event_time": 1552484741.644,
+                      "tags": {"workload_instance": "twemcache_mutilate--big--14--11213"}}],
                     [('irrelevant', 'sli>slo', 1),
-                     {"window_size": 10, "event_time": 1551978060.110}],
+                     {"window_size": 10, "event_time": 1552484941.644,
+                      "tags": {"workload_instance": "twemcache_mutilate--big--14--11213"}}],
                 ], 0, 3, 6),
         # 3 anomalies, 1 matching SLO violation and 6 SLO violations overall
         (
@@ -77,11 +80,14 @@ def _dict_from_json(path):
                 ],
                 [
                     [('irrelevant', 'sli>slo', 1),
-                     {"window_size": 10, "event_time": 1551978034.343}],
+                     {"window_size": 10, "event_time": 1552484541.644,
+                      "tags": {"workload_instance": "cassandra_stress--default--14--9142"}}],
                     [('irrelevant', 'sli>slo', 1),
-                     {"window_size": 10, "event_time": 1551977782.386}],
+                     {"window_size": 10, "event_time": 1552484741.644,
+                      "tags": {"workload_instance": "twemcache_mutilate--big--14--11213"}}],
                     [('irrelevant', 'sli>slo', 1),
-                     {"window_size": 10, "event_time": 1551978060.110}],
+                     {"window_size": 10, "event_time": 1552484941.644,
+                      "tags": {"workload_instance": "twemcache_mutilate--big--14--11213"}}],
                 ], 1, 3, 6),
         # 3 anomalies, 2 matching SLO violation and 6 SLO violations overall
         (
@@ -94,11 +100,14 @@ def _dict_from_json(path):
                 ],
                 [
                     [('irrelevant', 'sli>slo', 1),
-                     {"window_size": 10, "event_time": 1551978034.343}],
+                     {"window_size": 10, "event_time": 1552484541.644,
+                      "tags": {"workload_instance": "cassandra_stress--default--14--9142"}}],
                     [('irrelevant', 'sli>slo', 1),
-                     {"window_size": 10, "event_time": 1551977782.386}],
+                     {"window_size": 10, "event_time": 1552484741.644,
+                      "tags": {"workload_instance": "twemcache_mutilate--big--14--11213"}}],
                     [('irrelevant', 'sli>slo', 1),
-                     {"window_size": 10, "event_time": 1551978060.110}],
+                     {"window_size": 10, "event_time": 1552484941.644,
+                      "tags": {"workload_instance": "twemcache_mutilate--big--14--11213"}}],
                 ], 2, 3, 6),
         # no anomalies, no matching SLO violation and 6 SLO violations overall
         (
@@ -126,7 +135,8 @@ def test_calculate_components(anomalies, fetched_data, build_prometheus_url_call
         # Assert that URL used to fetch SLO violations for an anomaly is build as expected
         prm.accuracy.build_prometheus_url.assert_any_call(*call[0],
                                                           event_time=call[1]['event_time'],
-                                                          window_size=call[1]['window_size'])
+                                                          window_size=call[1]['window_size'],
+                                                          tags=call[1]['tags'])
 
     # Assert that build_prometheus_url() if no anomalies are found
     if len(build_prometheus_url_calls) == 0:

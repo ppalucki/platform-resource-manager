@@ -24,7 +24,8 @@
           "replica_index": "0",
           "scenario": "complex_llc.0",
           "workload_name": "redis_rpc_perf",
-          "workload_version_name": "default"
+          "workload_version_name": "default",
+          "workload_instance": "redis_rpc_perf--default--14--6791"
         },
         "values": [
           [
@@ -62,7 +63,8 @@
           "replica_index": "0",
           "scenario": "complex_llc.0",
           "workload_name": "redis_rpc_perf",
-          "workload_version_name": "default"
+          "workload_version_name": "default",
+          "workload_instance": "redis_rpc_perf--default--14--6791"
         },
         "values": [
           [

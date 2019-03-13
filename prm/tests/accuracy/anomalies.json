@@ -6,21 +6,38 @@
       {
         "metric": {
           "__name__": "anomaly",
-          "application": "twemcache",
-          "application_version_name": "big",
+          "application": "cassandra",
+          "application_host_ip": "100.64.176.14",
+          "application_version_name": "default",
           "aurora_tier": "preemptible",
-          "build_number": "76",
-          "contended_task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-7131e87d-3582-4d03-bf57-47b097c9378c",
-          "contending_task_id": "root-staging14-cassandra_stress-default--cassandra--9142-0-0-0bad0893-1ada-40a7-8d91-b55657986e6a",
-          "resource": "thermal design power",
-          "task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-7131e87d-3582-4d03-bf57-47b097c9378c",
-          "type": "contention",
-          "workload_name": "twemcache_mutilate",
-          "workload_version_name": "big"
+          "contended_task_id": "root-staging14-cassandra_stress-default--cassandra--9142-0-0-bcb8785b-6dd0-4259-b844-ddc8e2367a7f",
+          "contending_task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-6b439236-2155-48ba-b142-383e9aa3bc03",
+          "cores": "28",
+          "cpus": "56",
+          "env_uniq_id": "14",
+          "host": "igk-0106",
+          "instance": "127.0.0.1:9099",
+          "job": "owca_anomalies",
+          "job_name": "cassandra_stress.default--cassandra--9142.0",
+          "job_uniq_id": "9142",
+          "load_generator": "cassandra_stress",
+          "load_generator_host_ip": "100.64.176.16",
+          "name": "cassandra_stress.default--cassandra--9142.0",
+          "owca_version": "0.1.dev229+g50af833",
+          "own_ip": "100.64.176.14",
+          "replica_index": "0",
+          "resource": "memory bandwidth",
+          "sockets": "2",
+          "task_id": "root-staging14-cassandra_stress-default--cassandra--9142-0-0-bcb8785b-6dd0-4259-b844-ddc8e2367a7f",
+          "type": "best_efforts",
+          "uuid": "e21fb170-8f7e-8519-9e67-f60bc9a60956",
+          "workload_instance": "cassandra_stress--default--14--9142",
+          "workload_name": "cassandra_stress",
+          "workload_version_name": "default"
         },
         "values": [
           [
-            1551978034.343,
+            1552484541.644,
             "1"
           ]
         ]
@@ -32,11 +49,8 @@
           "application_host_ip": "100.64.176.14",
           "application_version_name": "big",
           "aurora_tier": "preemptible",
-          "build_commit": "e08dfd084c734238aae399ea4e445ad750af3fad",
-          "build_node_name": "100.64.176.16",
-          "build_number": "76",
-          "contended_task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-7131e87d-3582-4d03-bf57-47b097c9378c",
-          "contending_task_id": "root-staging14-redis_rpc_perf-default--redis--6790-0-0-bb7c2dde-027e-4bd8-a4bd-59f8fa6d6042",
+          "contended_task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-6b439236-2155-48ba-b142-383e9aa3bc03",
+          "contending_task_id": "root-staging14-redis_rpc_perf-default--redis--6790-0-0-2822281c-b2b1-478e-b7f5-c0ffe53ca2a1",
           "cores": "28",
           "cpus": "56",
           "env_uniq_id": "14",
@@ -52,21 +66,21 @@
           "own_ip": "100.64.176.14",
           "replica_index": "0",
           "resource": "thermal design power",
-          "scenario": "complex_llc.0",
           "sockets": "2",
-          "task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-7131e87d-3582-4d03-bf57-47b097c9378c",
+          "task_id": "root-staging14-twemcache_mutilate-big--twemcache--11213-0-0-6b439236-2155-48ba-b142-383e9aa3bc03",
           "type": "contention",
-          "uuid": "6e22546f-5e79-6ab8-bdd6-8990de906d13",
+          "uuid": "ae8f12f7-5b99-db05-92a9-0fa359de8643",
+          "workload_instance": "twemcache_mutilate--big--14--11213",
           "workload_name": "twemcache_mutilate",
           "workload_version_name": "big"
         },
         "values": [
           [
-            1551977782.386,
+            1552484741.644,
             "1"
           ],
           [
-            1551978060.110,
+            1552484941.644,
             "1"
           ]
         ]

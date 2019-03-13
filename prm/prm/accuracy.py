@@ -75,7 +75,10 @@ def calculate_components(anomalies, prometheus, build_number, violation_window_s
     for metric in anomalies['data']['result']:
         for anomaly in metric['values']:
             anomalies_found += 1
-            anomaly_slo_violations_url = build_prometheus_url(prometheus, 'sli>slo', build_number, event_time=anomaly[0], window_size=violation_window_size)
+            anomaly_slo_violations_url =\
+                build_prometheus_url(prometheus, 'sli>slo', build_number, event_time=anomaly[0],
+                                     window_size=violation_window_size,tags=
+                                     {'workload_instance': metric['metric']['workload_instance']})
             anomaly_slo_violations = fetch_metrics(anomaly_slo_violations_url)
             for _ in anomaly_slo_violations['data']['result']:
                 true_positives += 1
