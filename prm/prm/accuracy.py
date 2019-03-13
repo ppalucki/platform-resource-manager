@@ -16,7 +16,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from requests import get
-from math import inf
 
 _PROMETHEUS_QUERY_PATH = "/api/v1/query"
 _PROMETHEUS_QUERY_RANGE_PATH = "/api/v1/query_range"
@@ -75,10 +74,11 @@ def calculate_components(anomalies, prometheus, build_number, violation_window_s
     for metric in anomalies['data']['result']:
         for anomaly in metric['values']:
             anomalies_found += 1
-            anomaly_slo_violations_url =\
+            anomaly_slo_violations_url = \
                 build_prometheus_url(prometheus, 'sli>slo', build_number, event_time=anomaly[0],
-                                     window_size=violation_window_size,tags=
-                                     {'workload_instance': metric['metric']['workload_instance']})
+                                     window_size=violation_window_size,
+                                     tags={'workload_instance': metric['metric']
+                                     ['workload_instance']})
             anomaly_slo_violations = fetch_metrics(anomaly_slo_violations_url)
             for _ in anomaly_slo_violations['data']['result']:
                 true_positives += 1
@@ -94,12 +94,11 @@ def calculate_precision_and_recall(true_positives, anomalies_found, slo_violatio
     if anomalies_found == 0:
         precision = -1
     else:
-        precision = true_positives/anomalies_found
-        
+        precision = true_positives / anomalies_found
+
     if slo_violations == 0:
         recall = -1
     else:
-        recall = true_positives/slo_violations
+        recall = true_positives / slo_violations
 
     return precision, recall
-

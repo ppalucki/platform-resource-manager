@@ -17,7 +17,6 @@
 
 
 from json import loads
-from math import inf
 from unittest.mock import Mock
 
 import prm
@@ -47,7 +46,8 @@ def _dict_from_json(path):
 
 
 @pytest.mark.parametrize(
-    'anomalies,fetched_data,build_prometheus_url_calls,expected_true_positives,expected_anomalies_found,expected_real_positives',
+    'anomalies,fetched_data,build_prometheus_url_calls,expected_true_positives,'
+    'expected_anomalies_found,expected_real_positives',
     [
         # 3 anomalies, no matching SLO violations and 6 SLO violations overall
         (
@@ -153,7 +153,8 @@ def test_calculate_components(anomalies, fetched_data, build_prometheus_url_call
     ])
 def test_calculate_precision_and_recall(true_positives, anomaly_count, slo_violations,
                                         expected_precision, expected_recall):
-    precision, recall = calculate_precision_and_recall(true_positives, anomaly_count, slo_violations)
+    precision, recall = calculate_precision_and_recall(true_positives, anomaly_count,
+                                                       slo_violations)
 
     assert precision == expected_precision
     assert recall == expected_recall
