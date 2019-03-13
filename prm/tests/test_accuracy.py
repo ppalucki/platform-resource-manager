@@ -18,6 +18,7 @@
 
 from json import loads
 from unittest.mock import Mock
+from os.path import dirname, join
 
 import prm
 import pytest
@@ -41,7 +42,7 @@ def test_build_prometheus_url(prometheus, name, build_number, window_size,
 
 
 def _dict_from_json(path):
-    with open(path) as f:
+    with open(join(dirname(__file__), path)) as f:
         return loads(f.read())
 
 
