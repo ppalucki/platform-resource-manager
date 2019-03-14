@@ -64,7 +64,7 @@ def test_calculate_precision_and_recall(true_positives, anomaly_count, slo_viola
 
 
 @pytest.mark.parametrize(
-    'anomalies,fetched_data,expected_true_positives,expected_anomalies_found,'
+    'anomalies,requests,expected_true_positives,expected_anomalies_found,'
     'expected_real_positives',
     [
         # 3 anomalies, no matching SLO violations and 6 SLO violations overall
@@ -123,10 +123,10 @@ def test_calculate_precision_and_recall(true_positives, anomaly_count, slo_viola
                         _dict_from_json('accuracy/slo_violations.json')
                 }, 0, 0, 6),
     ])
-def test_calculate_components(anomalies, fetched_data, expected_true_positives,
+def test_calculate_components(anomalies, requests, expected_true_positives,
                               expected_anomalies_found, expected_real_positives):
-    with patch('prm.accuracy.get', Mock(side_effect=lambda url: Mock(Response,
-                                        json=Mock(return_value=fetched_data[url])))):
+    with patch('prm.accuracy.get',
+               Mock(side_effect=lambda url: Mock(Response, json=Mock(return_value=requests[url])))):
         true_positives, anomalies_found, real_positives = calculate_components(anomalies,
                                                                                'irrelevant', 1, 10)
 
