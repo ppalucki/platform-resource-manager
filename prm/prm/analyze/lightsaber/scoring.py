@@ -15,7 +15,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-""" This module scores a rule in terms of its discriminating capability """
+""" This module scores a rule in terms of its
+ discriminating capability """
 
 import math
 import numpy as np
@@ -34,7 +35,8 @@ class Scoring(object):
         if (configConstants.ConfigConstants.check_f_measure):
             f_measure = Scoring.calc_f_measure(total, positive, sub_total, sub_positive)
             f_measure2 = Scoring.calc_f_measure(
-                total, total - positive, total - sub_total, (total - positive) - (sub_total - sub_positive))
+                total, total - positive, total - sub_total,
+                (total - positive) - (sub_total - sub_positive))
             if (configConstants.ConfigConstants.verbose > 6):
                 output_str = "    2 f-measures: " + str(f_measure) + ", " + str(f_measure2)
                 print(output_str)
@@ -100,7 +102,8 @@ class Scoring(object):
         if (configConstants.ConfigConstants.verbose > 6):
             output_str = "    Information gain: " + str(ig)
             print(output_str)
-        if (ig < configConstants.ConfigConstants.information_gain_threshold and not configConstants.ConfigConstants.check_chi_square_test):
+        if (ig < configConstants.ConfigConstants.information_gain_threshold
+                and not configConstants.ConfigConstants.check_chi_square_test):
             ig = -1
         return ig
 

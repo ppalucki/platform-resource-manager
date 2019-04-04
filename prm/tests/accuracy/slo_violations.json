@@ -1,0 +1,86 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "matrix",
+    "result": [
+      {
+        "metric": {
+          "__name__": "sli",
+          "application": "redis",
+          "application_host_ip": "100.64.176.14",
+          "application_version_name": "default",
+          "build_commit": "ce3f710b015880735fd9d8e43dc33bc238d3d31d",
+          "build_node_name": "100.64.176.16",
+          "build_number": "78",
+          "env_uniq_id": "14",
+          "instance": "127.0.0.1:9099",
+          "job": "owca_workloads_redis_rpc_perf",
+          "job_name": "redis_rpc_perf.default--rpc_perf--6791.0",
+          "job_uniq_id": "6791",
+          "load_generator": "rpc_perf",
+          "load_generator_host_ip": "100.64.176.16",
+          "name": "redis_rpc_perf.default--rpc_perf--6791.0",
+          "own_ip": "100.64.176.16",
+          "replica_index": "0",
+          "scenario": "complex_llc.0",
+          "workload_name": "redis_rpc_perf",
+          "workload_version_name": "default",
+          "workload_instance": "redis_rpc_perf--default--14--6791"
+        },
+        "values": [
+          [
+            1552300478,
+            "102341"
+          ],
+          [
+            1552300479,
+            "102342"
+          ],
+          [
+            1552300480,
+            "102343"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "sli",
+          "application": "twemcache",
+          "application_host_ip": "100.64.176.14",
+          "application_version_name": "default",
+          "build_commit": "ce3f710b015880735fd9d8e43dc33bc238d3d31d",
+          "build_node_name": "100.64.176.16",
+          "build_number": "78",
+          "env_uniq_id": "14",
+          "instance": "127.0.0.1:9099",
+          "job": "owca_workloads_redis_rpc_perf",
+          "job_name": "redis_rpc_perf.default--rpc_perf--6791.0",
+          "job_uniq_id": "6791",
+          "load_generator": "rpc_perf",
+          "load_generator_host_ip": "100.64.176.16",
+          "name": "redis_rpc_perf.default--rpc_perf--6791.0",
+          "own_ip": "100.64.176.16",
+          "replica_index": "0",
+          "scenario": "complex_llc.0",
+          "workload_name": "redis_rpc_perf",
+          "workload_version_name": "default",
+          "workload_instance": "redis_rpc_perf--default--14--6791"
+        },
+        "values": [
+          [
+            1552301478,
+            "100"
+          ],
+          [
+            1552301479,
+            "101"
+          ],
+          [
+            1552301480,
+            "102"
+          ]
+        ]
+      }
+    ]
+  }
+}

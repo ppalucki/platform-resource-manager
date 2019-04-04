@@ -10,7 +10,7 @@ application_hosts:
       twemcache_mutilate:
         small:
           count: 2
-          slo: 100000
+          slo: 500
           communication_port: 11211
           twemcache:
             env:
@@ -34,7 +34,7 @@ application_hosts:
         big:
           # twice as much cores assigned, and 4 times more threads
           count: 1
-          slo: 100000
+          slo: 5000
           communication_port: 11213
           twemcache:
             env:
@@ -80,7 +80,7 @@ application_hosts:
           count: 1
           communication_port: 9142
           jmx_port: 7299
-          slo: 1000
+          slo: 5
           cassandra:
             image_name: cassandra
             image_tag: 3.11.3

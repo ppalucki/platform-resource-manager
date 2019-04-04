@@ -1,0 +1,95 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
+        AURORA_CLI_CONFIGURATION = credentials('clusters.json')
+        DEFAULT_INVENTORY = credentials('inventory.yml')
+        PRM_SUT = credentials('PRM_SUT')
+
+        PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
+        LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
+        MEMBW_INVENTORY='/prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+
+        LLC_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_llc.0\"}}"
+        MBW_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_mbw.0\"}}"
+    }
+    options {
+        disableConcurrentBuilds()
+        timeout(time: 75, unit: 'MINUTES')
+    }
+    stages {
+        stage("Run flake8 on PRM") {
+            steps {
+                sh'''
+                cd prm
+                tox -r -e flake8
+                '''
+            }
+        }
+        stage("Run PRM unit tests") {
+            steps {
+                sh'''
+                cd prm
+                tox -r -e unit
+                '''
+            }
+        }
+        stage("Build owca-prm.pex") {
+            steps {
+                sh'''
+                cd prm
+                tox -r -e package
+                '''
+                stash(name: "owca-prm", includes: "prm/dist/**")
+                archiveArtifacts(artifacts: "prm/dist/**")
+            }
+            post {
+                always {
+                    sh '''
+                    rm -fr prm/dist
+                    '''
+                }
+            }
+        }
+        stage("Run LLC experiment") {
+            steps {
+                sh '''
+                mkdir -p ${HOME}/.aurora
+                cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}${PLAYBOOK}
+                sleep 600
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}${PLAYBOOK}
+                sleep 300
+                '''
+            }
+            post {
+                always {
+                    sh '''
+                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} --tags=clean_jobs ${WORKSPACE}${PLAYBOOK}
+                    rm -fr ${HOME}/.aurora/
+                    '''
+                }
+            }
+        }
+        stage("Run Memory Bandwidth experiment") {
+            steps {
+                sh '''
+                mkdir -p ${HOME}/.aurora
+                cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}${PLAYBOOK}
+                sleep 1800
+                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=tensorflow_benchmark_prediction -e "${MBW_LABELS}" ${WORKSPACE}${PLAYBOOK}
+                sleep 300
+                '''
+            }
+            post {
+                always {
+                    sh '''
+                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} --tags=clean_jobs ${WORKSPACE}${PLAYBOOK}
+                    rm -fr ${HOME}/.aurora/
+                    '''
+                }
+            }
+        }
+    }
+}

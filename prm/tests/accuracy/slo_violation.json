@@ -1,0 +1,33 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "vector",
+    "result": [
+      {
+        "metric": {
+          "__name__": "sli",
+          "application": "redis",
+          "application_host_ip": "100.64.176.14",
+          "application_version_name": "default",
+          "env_uniq_id": "14",
+          "instance": "127.0.0.1:9099",
+          "job": "owca_workloads_redis_rpc_perf",
+          "job_name": "redis_rpc_perf.default--rpc_perf--6791.0",
+          "job_uniq_id": "6791",
+          "load_generator": "rpc_perf",
+          "load_generator_host_ip": "100.64.176.16",
+          "name": "redis_rpc_perf.default--rpc_perf--6791.0",
+          "own_ip": "100.64.176.16",
+          "replica_index": "0",
+          "workload_instance": "redis_rpc_perf--default--14--6791",
+          "workload_name": "redis_rpc_perf",
+          "workload_version_name": "default"
+        },
+        "value": [
+          1552484995.099,
+          "261"
+        ]
+      }
+    ]
+  }
+}
