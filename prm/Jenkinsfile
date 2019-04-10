@@ -78,7 +78,7 @@ pipeline {
 
                 ### RESULTS
                 cd ${WORKSPACE}/prm
-                pipenv run python calculate_accuracy.py --build_number ${BUILD_NUMBER} --prometheus ${PROMETHEUS}
+                pipenv run python calculate_accuracy.py --prometheus ${PROMETHEUS} ${BUILD_NUMBER} 
                 '''
             }
             post {
