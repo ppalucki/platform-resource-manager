@@ -18,11 +18,19 @@ pipeline {
         timeout(time: 75, unit: 'MINUTES')
     }
     stages {
+        stage("Prepare venv") {
+            steps {
+                sh'''
+                cd prm
+                make venv
+                '''
+            }
+        }
         stage("Run flake8 on PRM") {
             steps {
                 sh'''
                 cd prm
-                tox -r -e flake8
+                make flake8
                 '''
             }
         }
@@ -30,7 +38,7 @@ pipeline {
             steps {
                 sh'''
                 cd prm
-                tox -r -e unit
+                make unit
                 '''
             }
         }
@@ -38,7 +46,7 @@ pipeline {
             steps {
                 sh'''
                 cd prm
-                tox -r -e package
+                make package
                 '''
                 stash(name: "owca-prm", includes: "prm/dist/**")
                 archiveArtifacts(artifacts: "prm/dist/**")
