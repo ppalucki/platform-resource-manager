@@ -11,10 +11,9 @@ pipeline {
     }
     options {
         disableConcurrentBuilds()
-        timeout(time: 75, unit: 'MINUTES')
+        timeout(time: 5, unit: 'MINUTES')
     }
     stages {
-        /*
         stage("Prepare venv") {
             steps {
                 sh'''
@@ -45,8 +44,8 @@ pipeline {
                 cd prm
                 make package
                 '''
-                stash(name: "owca-prm", includes: "prm/dist/**")
-                archiveArtifacts(artifacts: "prm/dist/**")
+                // stash(name: "owca-prm", includes: "prm/dist/**")
+                // archiveArtifacts(artifacts: "prm/dist/**")
             }
             post {
                 always {
@@ -56,7 +55,6 @@ pipeline {
                 }
             }
         }
-        */
         stage("Prepare aurora cluster") {
             steps {
                 sh'''
@@ -68,16 +66,18 @@ pipeline {
         stage("Run LLC experiment") {
             steps {
                 sh '''
-                cd prm/owca/workloads
-
-                ### DEBUG
                 #env
-                #ansible-inventory -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} -y --list all
 
+                ### WORKLOADS
+                cd ${WORKSPACE}/prm/owca/workloads
+                #ansible-inventory -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} -y --list all
                 ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
                 sleep 60
                 ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
                 sleep 30
+
+                ### RESULTS
+                cd ${WORKSPACE}/prm
                 pipenv run python calculate_accuracy.py --build_number ${BUILD_NUMBER} --prometheus ${PROMETHEUS}
                 '''
             }
