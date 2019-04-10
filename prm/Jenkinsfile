@@ -70,13 +70,14 @@ pipeline {
                 sh '''
                 env
                 cd prm/owca/workloads
-                ansible-invetory -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${COMMON_INVENTORY} -y --list all
+                ansible-inventory -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${COMMON_INVENTORY} -y --list all
                 ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${COMMON_INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
                 # sleep 600
                 # ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${COMMON_INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
                 # sleep 300
                 '''
             }
+            /*
             post {
                 always {
                     sh '''
@@ -85,6 +86,7 @@ pipeline {
                     '''
                 }
             }
+            */
         }
         /*
         stage("Run Memory Bandwidth experiment") {
