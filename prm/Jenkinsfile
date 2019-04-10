@@ -1,14 +1,10 @@
 pipeline {
     agent any
     environment {
-        DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
-        AURORA_CLI_CONFIGURATION = credentials('clusters.json')
-        DEFAULT_INVENTORY = credentials('inventory.yml')
-        PRM_SUT = credentials('PRM_SUT')
-
-        PLAYBOOK='/prm/owca/workloads/run_workloads.yaml'
-        LLC_INVENTORY='/prm/demo_scenarios/complex_llc.0/inventory.yaml'
-        MEMBW_INVENTORY='/prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+        HOSTS_INVENTORY='prm/demo_scenarios/common/inventory.yaml'
+        PLAYBOOK='prm/owca/workloads/run_workloads.yaml'
+        LLC_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+        MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
 
         LLC_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_llc.0\"}}"
         MBW_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_mbw.0\"}}"
@@ -18,6 +14,7 @@ pipeline {
         timeout(time: 75, unit: 'MINUTES')
     }
     stages {
+        /*
         stage("Prepare venv") {
             steps {
                 sh'''
@@ -59,15 +56,25 @@ pipeline {
                 }
             }
         }
+        */
+        stage("Prepare aurora cluster") {
+            steps {
+                sh'''
+                mkdir -p ${HOME}/.aurora
+                cp ./prm/demo_scenarios/common/aurora-clusters.json  ${HOME}/.aurora/clusters.json
+                '''
+            }
+        }
         stage("Run LLC experiment") {
             steps {
                 sh '''
-                mkdir -p ${HOME}/.aurora
-                cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}${PLAYBOOK}
-                sleep 600
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${LLC_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}${PLAYBOOK}
-                sleep 300
+                env
+                cd prm/owca/workloads
+                ansible-invetory -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${COMMON_INVENTORY} -y --list all
+                ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${COMMON_INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
+                # sleep 600
+                # ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${COMMON_INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
+                # sleep 300
                 '''
             }
             post {
@@ -79,6 +86,7 @@ pipeline {
                 }
             }
         }
+        /*
         stage("Run Memory Bandwidth experiment") {
             steps {
                 sh '''
@@ -99,5 +107,6 @@ pipeline {
                 }
             }
         }
+        */
     }
 }
