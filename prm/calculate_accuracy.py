@@ -34,6 +34,7 @@ def main():
     anomalies = fetch_metrics(url)
     true_positives, anomaly_count, slo_violations = calculate_components(anomalies)
     precision, recall = calculate_precision_and_recall(true_positives, anomaly_count, slo_violations)
+    print(precision, recall)
 
 
 if __name__ == "__main__":

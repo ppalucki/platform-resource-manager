@@ -5,7 +5,6 @@ pipeline {
         INVENTORY='prm/demo_scenarios/common/inventory.yaml'
         LLC_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
         MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
-
         LLC_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_llc.0\"}}"
         MBW_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_mbw.0\"}}"
     }
@@ -72,21 +71,32 @@ pipeline {
                 cd prm/owca/workloads
                 ansible-inventory -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} -y --list all
                 ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
-                # sleep 600
-                # ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
-                # sleep 300
+                sleep 60
+                ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
+                sleep 30
                 '''
             }
-            /*
             post {
                 always {
                     sh '''
-                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} --tags=clean_jobs ${WORKSPACE}${PLAYBOOK}
+                    ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}
                     rm -fr ${HOME}/.aurora/
                     '''
                 }
             }
-            */
+        }
+        stage("Calculate results") {
+            steps {
+                sh '''
+                cd prm/
+                ansible-inventory -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} -y --list all
+                ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
+                sleep 60
+                ansible-playbook -vvv -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
+                sleep 30
+                pipenv run python calculate_accuracy.py --build_number ${BUILD_NUMBER} --prometheus 'http://100.64.176.12:9090' 
+                '''
+            }
         }
         /*
         stage("Run Memory Bandwidth experiment") {
