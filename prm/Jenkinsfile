@@ -61,7 +61,7 @@ pipeline {
             steps {
                 sh'''
                 mkdir -p ${HOME}/.aurora
-                cp ./prm/demo_scenarios/common/aurora-clusters.json  ${HOME}/.aurora/clusters.json
+                cp ${WORKSPACE}/prm/demo_scenarios/common/aurora-clusters.json  ${HOME}/.aurora/clusters.json
                 '''
             }
         }
