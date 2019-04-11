@@ -65,28 +65,29 @@ pipeline {
         }
         stage("Run LLC experiment") {
             steps {
-                sh '''
-                #env
-
-                ### WORKLOADS
-                cd ${WORKSPACE}/prm/owca/workloads
-                #ansible-inventory -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} -y --list all
-                ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
-                sleep 60
-                ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}
-                sleep 30
-
-                ### RESULTS
-                cd ${WORKSPACE}/prm
-                pipenv run python calculate_accuracy.py --prometheus ${PROMETHEUS} ${BUILD_NUMBER} 
-                '''
+                dir '/prm/owca/workloads' {
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
+                    sleep 60
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                    sleep 30
+                }
+                dir 'prm' {
+                    sh 'pipenv run python calculate_accuracy.py --prometheus ${PROMETHEUS} ${BUILD_NUMBER}'
+                }
             }
             post {
                 always {
                     sh '''
-                    ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}
+                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} --tags=clean_jobs ${WORKSPACE}${PLAYBOOK}
                     rm -fr ${HOME}/.aurora/
                     '''
+                }
+            }
+        }
+        stage("Kill all jobs") {
+            steps {
+                dir '/prm/owca/workloads' {
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
                 }
             }
         }
