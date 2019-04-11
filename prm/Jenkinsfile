@@ -78,7 +78,7 @@ pipeline {
             post {
                 always {
                     sh '''
-                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} --tags=clean_jobs ${WORKSPACE}${PLAYBOOK}
+                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}
                     rm -fr ${HOME}/.aurora/
                     '''
                 }
@@ -95,21 +95,9 @@ pipeline {
         stage("Run Memory Bandwidth experiment") {
             steps {
                 sh '''
-                mkdir -p ${HOME}/.aurora
-                cp  ${AURORA_CLI_CONFIGURATION} ${HOME}/.aurora/clusters.json
                 ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}${PLAYBOOK}
-                sleep 1800
                 ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=tensorflow_benchmark_prediction -e "${MBW_LABELS}" ${WORKSPACE}${PLAYBOOK}
-                sleep 300
                 '''
-            }
-            post {
-                always {
-                    sh '''
-                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} --tags=clean_jobs ${WORKSPACE}${PLAYBOOK}
-                    rm -fr ${HOME}/.aurora/
-                    '''
-                }
             }
         }
         */
