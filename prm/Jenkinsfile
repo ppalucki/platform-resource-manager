@@ -14,12 +14,15 @@ pipeline {
         timeout(time: 5, unit: 'MINUTES')
     }
     parameters {
-        booleanParam(name: 'REDEPLOY_PEX', defaultValue: false)
+        booleanParam(name: 'REDEPLOY_PEX', defaultValue: false, description: 'Toggle this value')
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
     }
     stages {
         stage('Redeploy pex') {
 
-            when params.REDEPLOY_PEX
+            when {
+                expression { return params.REDEPLOY_PEX }
+            }
 
             stage("Prepare venv") {
                 steps {
