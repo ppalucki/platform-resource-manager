@@ -77,24 +77,28 @@ pipeline {
         stage("Run LLC experiment") {
             steps {
                 dir('prm/owca/workloads'){
+                    echo 'start baseline'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
                     sleep 60
+                    echo 'start contender'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep 30
                 }
                 dir('prm'){
+                    echo 'calcuate results'
                     sh 'pipenv run python calculate_accuracy.py --prometheus ${PROMETHEUS} ${BUILD_NUMBER}'
                 }
             }
             post {
                 always {
+                    echo 'stop workloads'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
                 }
             }
         }
         stage("Kill all jobs") {
             steps {
-                dir '/prm/owca/workloads' {
+                dir('/prm/owca/workloads') {
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
                 }
             }
