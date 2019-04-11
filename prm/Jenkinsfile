@@ -15,53 +15,53 @@ pipeline {
     }
     parameters {
         booleanParam(name: 'REDEPLOY_PEX', defaultValue: false, description: 'Toggle this value')
-        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
     }
     stages {
         stage('Redeploy pex') {
-
             when {
                 expression { return params.REDEPLOY_PEX }
             }
+            stages {
 
-            stage("Prepare venv") {
-                steps {
-                    sh'''
-                    cd prm
-                    make venv
-                    '''
-                }
-            }
-            stage("Run flake8 on PRM") {
-                steps {
-                    sh'''
-                    cd prm
-                    make flake8
-                    '''
-                }
-            }
-            stage("Run PRM unit tests") {
-                steps {
-                    sh'''
-                    cd prm
-                    make unit
-                    '''
-                }
-            }
-            stage("Build owca-prm.pex") {
-                steps {
-                    sh'''
-                    cd prm
-                    make package
-                    '''
-                    // stash(name: "owca-prm", includes: "prm/dist/**")
-                    // archiveArtifacts(artifacts: "prm/dist/**")
-                }
-                post {
-                    always {
-                        sh '''
-                        rm -fr prm/dist
+                stage("Prepare venv") {
+                    steps {
+                        sh'''
+                        cd prm
+                        make venv
                         '''
+                    }
+                }
+                stage("Run flake8 on PRM") {
+                    steps {
+                        sh'''
+                        cd prm
+                        make flake8
+                        '''
+                    }
+                }
+                stage("Run PRM unit tests") {
+                    steps {
+                        sh'''
+                        cd prm
+                        make unit
+                        '''
+                    }
+                }
+                stage("Build owca-prm.pex") {
+                    steps {
+                        sh'''
+                        cd prm
+                        make package
+                        '''
+                        // stash(name: "owca-prm", includes: "prm/dist/**")
+                        // archiveArtifacts(artifacts: "prm/dist/**")
+                    }
+                    post {
+                        always {
+                            sh '''
+                            rm -fr prm/dist
+                            '''
+                        }
                     }
                 }
             }
