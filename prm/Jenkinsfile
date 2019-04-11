@@ -76,13 +76,13 @@ pipeline {
         }
         stage("Run LLC experiment") {
             steps {
-                dir 'prm/owca/workloads' {
+                dir('prm/owca/workloads'){
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
                     sleep 60
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep 30
                 }
-                dir 'prm' {
+                dir('prm'){
                     sh 'pipenv run python calculate_accuracy.py --prometheus ${PROMETHEUS} ${BUILD_NUMBER}'
                 }
             }
