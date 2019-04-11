@@ -32,7 +32,8 @@ def main():
 
     url = build_prometheus_url(args.prometheus, 'anomaly', args.build_number)
     anomalies = fetch_metrics(url)
-    true_positives, anomaly_count, slo_violations = calculate_components(anomalies)
+    true_positives, anomaly_count, slo_violations = calculate_components(
+        anomalies, args.prometheus, args.build_number, args.window_size)
     precision, recall = calculate_precision_and_recall(true_positives, anomaly_count, slo_violations)
     print(precision, recall)
 
