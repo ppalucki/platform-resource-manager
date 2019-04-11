@@ -14,7 +14,9 @@ pipeline {
         timeout(time: 5, unit: 'MINUTES')
     }
     parameters {
-        booleanParam(name: 'REDEPLOY_PEX', defaultValue: false, description: 'Toggle this value')
+        booleanParam(name: 'REDEPLOY_PEX', defaultValue: false, description: 'Redeploy pex this value')
+        booleanParam(name: 'LLC', defaultValue: false, description: 'Run LLC experiment')
+        booleanParam(name: 'MB', defaultValue: false, description: 'Run LLC experiment')
     }
     stages {
         stage('Redeploy pex') {
@@ -96,9 +98,9 @@ pipeline {
                 }
             }
         }
-        stage("Kill all jobs") {
+        stage("Clean all jobs") {
             steps {
-                dir('/prm/owca/workloads') {
+                dir('prm/owca/workloads') {
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
                 }
             }
