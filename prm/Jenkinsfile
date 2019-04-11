@@ -65,7 +65,7 @@ pipeline {
         }
         stage("Run LLC experiment") {
             steps {
-                dir '/prm/owca/workloads' {
+                dir 'prm/owca/workloads' {
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
                     sleep 60
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
@@ -77,10 +77,7 @@ pipeline {
             }
             post {
                 always {
-                    sh '''
-                    ansible-playbook -vvv -l ${PRM_SUT} -i ${DEFAULT_INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}
-                    rm -fr ${HOME}/.aurora/
-                    '''
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
                 }
             }
         }
