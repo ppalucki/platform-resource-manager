@@ -13,45 +13,53 @@ pipeline {
         disableConcurrentBuilds()
         timeout(time: 5, unit: 'MINUTES')
     }
+    parameters {
+        booleanParam(name: 'REDEPLOY_PEX', defaultValue: false)
+    }
     stages {
-        stage("Prepare venv") {
-            steps {
-                sh'''
-                cd prm
-                make venv
-                '''
-            }
-        }
-        stage("Run flake8 on PRM") {
-            steps {
-                sh'''
-                cd prm
-                make flake8
-                '''
-            }
-        }
-        stage("Run PRM unit tests") {
-            steps {
-                sh'''
-                cd prm
-                make unit
-                '''
-            }
-        }
-        stage("Build owca-prm.pex") {
-            steps {
-                sh'''
-                cd prm
-                make package
-                '''
-                // stash(name: "owca-prm", includes: "prm/dist/**")
-                // archiveArtifacts(artifacts: "prm/dist/**")
-            }
-            post {
-                always {
-                    sh '''
-                    rm -fr prm/dist
+        stage('Redeploy pex') {
+
+            when params.REDEPLOY_PEX
+
+            stage("Prepare venv") {
+                steps {
+                    sh'''
+                    cd prm
+                    make venv
                     '''
+                }
+            }
+            stage("Run flake8 on PRM") {
+                steps {
+                    sh'''
+                    cd prm
+                    make flake8
+                    '''
+                }
+            }
+            stage("Run PRM unit tests") {
+                steps {
+                    sh'''
+                    cd prm
+                    make unit
+                    '''
+                }
+            }
+            stage("Build owca-prm.pex") {
+                steps {
+                    sh'''
+                    cd prm
+                    make package
+                    '''
+                    // stash(name: "owca-prm", includes: "prm/dist/**")
+                    // archiveArtifacts(artifacts: "prm/dist/**")
+                }
+                post {
+                    always {
+                        sh '''
+                        rm -fr prm/dist
+                        '''
+                    }
                 }
             }
         }
