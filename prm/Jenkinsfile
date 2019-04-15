@@ -28,20 +28,7 @@ pipeline {
                     steps {
                         dir('prm') {
                             sh('make venv')
-                        }
-                    }
-                }
-                stage("Run flake8 on PRM") {
-                    steps {
-                        dir('prm') {
-                            sh('make flake8')
-                        }
-                    }
-                }
-                stage("Run PRM unit tests") {
-                    steps {
-                        dir('prm') {
-                            sh('make unit')
+                            sh('make check')
                         }
                     }
                 }

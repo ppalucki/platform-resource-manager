@@ -1,5 +1,5 @@
 # Do not really on artifacts created by make for all targets.
-.PHONY: all venv flake8 unit package clean tests check dist
+.PHONY: all venv flake8 unit package clean check dist
 
 all: venv check dist
 
@@ -12,8 +12,12 @@ flake8:
 	@echo Checking code quality.
 	pipenv run flake8 owca tests example workloads
 
+unit:
+	@echo Running unit tests
+	pipenv run pytest tests
+
 package: 
-	@echo Building owca pex file.
+	@echo Building owca-pex file.
 	-rm dist/owca-prm.pex
 	-rm .pex-build/owca*
 	-rm .pex-build/prm*
@@ -21,8 +25,7 @@ package:
 	pipenv run env PYTHONPATH=. pex . owca -v --cache-dir=.pex-build --output=dist/owca-prm.pex -m owca.main:main 
 	./dist/owca-prm.pex --version
 
-
-check: flake8
+check: flake8 unit
 
 dist: package
 
