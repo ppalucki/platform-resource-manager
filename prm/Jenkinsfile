@@ -24,44 +24,31 @@ pipeline {
                 expression { return params.REDEPLOY_PEX }
             }
             stages {
-
                 stage("Prepare venv") {
                     steps {
-                        sh'''
-                        cd prm
-                        make venv
-                        '''
+                        dir('prm') {
+                            sh('make venv')
+                        }
                     }
                 }
                 stage("Run flake8 on PRM") {
                     steps {
-                        sh'''
-                        cd prm
-                        make flake8
-                        '''
+                        dir('prm') {
+                            sh('make flake8')
+                        }
                     }
                 }
                 stage("Run PRM unit tests") {
                     steps {
-                        sh'''
-                        cd prm
-                        make unit
-                        '''
+                        dir('prm') {
+                            sh('make unit')
+                        }
                     }
                 }
                 stage("Build owca-prm.pex") {
                     steps {
-                        sh'''
-                        cd prm
-                        make package
-                        '''
-                        stash(name: "owca-prm", includes: "prm/dist/**")
-                    }
-                    post {
-                        always {
-                            sh '''
-                            rm -fr prm/dist
-                            '''
+                        dir('prm') {
+                            sh('make package')
                         }
                     }
                 }
@@ -71,7 +58,7 @@ pipeline {
                         sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
                         sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
                         sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
-                        sudo cp ${WORKSPACE}/dist/owca-prm.pex /usr/bin/
+                        sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
                         sudo systemctl restart owca
                         '''
                     }
