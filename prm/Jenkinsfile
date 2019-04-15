@@ -66,13 +66,15 @@ pipeline {
                     }
                 }
                 stage("Restart owca service") {
-                    sh'''
-                    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
-                    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
-                    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
-                    sudo cp ${WORKSPACE}/dist/owca-prm.pex /usr/bin/
-                    sudo systemctl restart owca
-                    '''
+                    steps {
+                        sh'''
+                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
+                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
+                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
+                        sudo cp ${WORKSPACE}/dist/owca-prm.pex /usr/bin/
+                        sudo systemctl restart owca
+                        '''
+                    }
                 }
             }
         }
