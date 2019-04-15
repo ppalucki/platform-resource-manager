@@ -57,6 +57,12 @@ pipeline {
                         '''
                         // stash(name: "owca-prm", includes: "prm/dist/**")
                         // archiveArtifacts(artifacts: "prm/dist/**")
+                        sh'''
+                        scp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json root@100.64.176.14:/var/lib/owca/
+                        scp ${WORKSPACE}/prm/demo_scenarios/common/workload.json root@100.64.176.14:/var/lib/owca/
+                        scp ${WORKSPACE}/dist/owca-prm.pex root@100.64.176.14:/usr/bin/
+                        ssh root@100.64.176.14 systemctl restart owca
+                        '''
                     }
                     post {
                         always {
