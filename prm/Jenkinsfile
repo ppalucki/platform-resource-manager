@@ -117,19 +117,18 @@ pipeline {
                 expression { return params.MB }
             }
             steps {
-                echo 'start baseline'
-                sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
-                sleep 60
-                echo 'start contender'
-                sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                sleep 30
+                dir('prm/owca/workloads'){
+                    echo 'start baseline'
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
+                    sleep 60
+                    echo 'start contender'
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+
                 }
                 dir('prm'){
                     echo 'calcuate results'
                     sh 'pipenv run python calculate_accuracy.py --prometheus ${PROMETHEUS} ${BUILD_NUMBER}'
                 }
-                sh '''
-                '''
             }
         }
         stage("Clean all jobs") {
