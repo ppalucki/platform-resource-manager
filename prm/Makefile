@@ -14,7 +14,7 @@ flake8:
 
 unit:
 	@echo Running unit tests
-	pipenv run pytest tests
+	PYTHONPATH=. pipenv run pytest tests
 
 package: 
 	@echo Building owca-pex file.
