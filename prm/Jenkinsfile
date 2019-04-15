@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'mesos' }
     environment {
         PLAYBOOK='prm/owca/workloads/run_workloads.yaml'
         INVENTORY='prm/demo_scenarios/common/inventory.yaml'
@@ -55,14 +55,7 @@ pipeline {
                         cd prm
                         make package
                         '''
-                        // stash(name: "owca-prm", includes: "prm/dist/**")
-                        // archiveArtifacts(artifacts: "prm/dist/**")
-                        sh'''
-                        scp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json root@100.64.176.14:/var/lib/owca/
-                        scp ${WORKSPACE}/prm/demo_scenarios/common/workload.json root@100.64.176.14:/var/lib/owca/
-                        scp ${WORKSPACE}/dist/owca-prm.pex root@100.64.176.14:/usr/bin/
-                        ssh root@100.64.176.14 systemctl restart owca
-                        '''
+                        stash(name: "owca-prm", includes: "prm/dist/**")
                     }
                     post {
                         always {
@@ -71,6 +64,15 @@ pipeline {
                             '''
                         }
                     }
+                }
+                stage("Restart owca service") {
+                    sh'''
+                    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
+                    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
+                    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
+                    sudo cp ${WORKSPACE}/dist/owca-prm.pex /usr/bin/
+                    sudo systemctl restart owca
+                    '''
                 }
             }
         }
