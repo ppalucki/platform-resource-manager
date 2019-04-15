@@ -79,6 +79,7 @@ pipeline {
             }
         }
         stage("Prepare aurora cluster") {
+            when { expression { return params.MB | params.LLC} }
             steps {
                 sh'''
                 mkdir -p ${HOME}/.aurora
@@ -87,6 +88,9 @@ pipeline {
             }
         }
         stage("Run LLC experiment") {
+            when {
+                expression { return params.LLC }
+            }
             steps {
                 dir('prm/owca/workloads'){
                     echo 'start baseline'
@@ -108,22 +112,33 @@ pipeline {
                 }
             }
         }
+        stage("Run Memory Bandwidth experiment") {
+            when {
+                expression { return params.MB }
+            }
+            steps {
+                echo 'start baseline'
+                sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
+                sleep 60
+                echo 'start contender'
+                sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                sleep 30
+                }
+                dir('prm'){
+                    echo 'calcuate results'
+                    sh 'pipenv run python calculate_accuracy.py --prometheus ${PROMETHEUS} ${BUILD_NUMBER}'
+                }
+                sh '''
+                '''
+            }
+        }
         stage("Clean all jobs") {
+            when { expression { return params.MB | params.LLC} }
             steps {
                 dir('prm/owca/workloads') {
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
                 }
             }
         }
-        /*
-        stage("Run Memory Bandwidth experiment") {
-            steps {
-                sh '''
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}${PLAYBOOK}
-                ansible-playbook -vvv -l ${PRM_SUT} -i ${WORKSPACE}${MEMBW_INVENTORY} -i ${DEFAULT_INVENTORY} --tags=tensorflow_benchmark_prediction -e "${MBW_LABELS}" ${WORKSPACE}${PLAYBOOK}
-                '''
-            }
-        }
-        */
     }
 }
