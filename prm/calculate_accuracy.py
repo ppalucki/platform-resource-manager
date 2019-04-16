@@ -23,6 +23,8 @@ from argparse import ArgumentParser
 from prm.accuracy import (build_prometheus_url, fetch_metrics,
                           calculate_components, calculate_precision_and_recall)
 
+import logging
+
 
 def main():
     parser = ArgumentParser()
@@ -46,14 +48,25 @@ def main():
 def test_integration_accurracy():
     prometheus = os.environ['PROMETHEUS']
     build_number = int(os.environ['BUILD_NUMBER'])
+    logging.basicConfig(level=logging.DEBUG)
     window_size = 10.0
+
+    logging.info('window size = %s', window_size)
     url = build_prometheus_url(prometheus, 'anomaly', build_number)
     anomalies = fetch_metrics(url)
+    logging.info('found anomalies = %s', len(anomalies))
+
     true_positives, anomaly_count, slo_violations = calculate_components(
         anomalies, prometheus, build_number, window_size)
+    logging.debug('found true positives = %s', true_positives)
+    logging.debug('found anomaly count = %s', anomaly_count)
+    logging.debug('found slo violations count = %s', slo_violations)
+
     precision, recall = calculate_precision_and_recall(
         true_positives, anomaly_count, slo_violations)
 
+    logging.info('recall = %s', recall)
+    logging.info('precision = %s', precision)
     assert precision > 0
     assert recall > 0
 
