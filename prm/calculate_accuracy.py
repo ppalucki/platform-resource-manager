@@ -51,6 +51,7 @@ def test_integration_accurracy():
     window_size = 10.0
 
     logging.info('window size = %s', window_size)
+    logging.info('build number = %r', build_number)
     url = build_prometheus_url(prometheus, 'anomaly', build_number)
     anomalies = fetch_metrics(url)
     logging.info('found anomalies = %s', len(anomalies))

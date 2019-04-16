@@ -77,7 +77,7 @@ pipeline {
                     sleep 30
                 }
                 dir('prm'){
-                    echo 'Calculate results.'
+                    echo "Calculate LLC results for ${BUILD_NUMBER}."
                     sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
                 }
             }
@@ -104,7 +104,7 @@ pipeline {
 
                 }
                 dir('prm'){
-                    echo 'Calculate results.'
+                    echo "Calculate MBW results for ${BUILD_NUMBER}."
                     sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw --log-level=debug'
                 }
             }
