@@ -23,6 +23,7 @@ from argparse import ArgumentParser
 from prm.accuracy import (build_prometheus_url, fetch_metrics,
                           calculate_components, calculate_precision_and_recall)
 
+
 import logging
 
 
@@ -45,9 +46,11 @@ def main():
     print(precision, recall)
 
 
-def test_integration_accurracy():
+def test_integration_accurracy(record_property):
+
     prometheus = os.environ['PROMETHEUS']
     build_number = int(os.environ['BUILD_NUMBER'])
+    record_property('build_number', build_number)
     window_size = 10.0
 
     logging.info('window size = %s', window_size)
@@ -65,6 +68,8 @@ def test_integration_accurracy():
     precision, recall = calculate_precision_and_recall(
         true_positives, anomaly_count, slo_violations)
 
+    record_property('recall', recall)
+    record_property('precision', precision)
     logging.info('recall = %s', recall)
     logging.info('precision = %s', precision)
     assert precision > 0

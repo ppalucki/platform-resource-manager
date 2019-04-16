@@ -71,7 +71,7 @@ pipeline {
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
-                    sleep 60
+                    sleep 30
                     echo 'Start contender workload.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep 30
@@ -98,9 +98,10 @@ pipeline {
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
-                    sleep 60
+                    sleep 30
                     echo 'Start contender workload.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                    sleep 30
 
                 }
                 dir('prm'){
