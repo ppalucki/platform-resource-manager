@@ -47,8 +47,9 @@ pipeline {
                         sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
                         sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
                         sudo systemctl restart owca
-                        sudo systemctl status owca
                         '''
+                        sleep 5
+                        sh 'sudo systemctl status owca'
                     }
                 }
             }
@@ -68,22 +69,23 @@ pipeline {
             }
             steps {
                 dir('prm/owca/workloads'){
-                    echo 'start baseline'
+                    echo 'Start baseline workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
                     sleep 60
-                    echo 'start contender'
+                    echo 'Start contender workload.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep 30
                 }
                 dir('prm'){
-                    echo 'Calcuate results'
+                    echo 'Calculate results.'
                     sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc'
                 }
             }
             post {
                 always {
-                    echo 'stop workloads'
+                    echo 'Stop all workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    echo 'Storing LLC results.'
                     junit 'prm/unit_results.xml'
                 }
             }
@@ -94,22 +96,23 @@ pipeline {
             }
             steps {
                 dir('prm/owca/workloads'){
-                    echo 'start baseline'
+                    echo 'Start baseline workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
                     sleep 60
-                    echo 'start contender'
+                    echo 'Start contender workload.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
 
                 }
                 dir('prm'){
-                    echo 'calcuate results'
+                    echo 'Calculate results.'
                     sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw'
                 }
             }
             post {
                 always {
-                    echo 'stop workloads'
+                    echo 'Stop all workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    echo 'Storing MBW results.'
                     junit 'prm/unit_results.xml'
                 }
             }
