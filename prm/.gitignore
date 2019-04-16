@@ -7,3 +7,4 @@
 /.pex-cache
 /.pex-build
 /.coverage
+unit_results.xml

@@ -48,7 +48,6 @@ def main():
 def test_integration_accurracy():
     prometheus = os.environ['PROMETHEUS']
     build_number = int(os.environ['BUILD_NUMBER'])
-    logging.basicConfig(level=logging.DEBUG)
     window_size = 10.0
 
     logging.info('window size = %s', window_size)

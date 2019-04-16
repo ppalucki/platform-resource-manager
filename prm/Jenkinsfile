@@ -78,7 +78,7 @@ pipeline {
                 }
                 dir('prm'){
                     echo 'Calculate results.'
-                    sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc'
+                    sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
                 }
             }
             post {
@@ -105,7 +105,7 @@ pipeline {
                 }
                 dir('prm'){
                     echo 'Calculate results.'
-                    sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw'
+                    sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw --log-level=debug'
                 }
             }
             post {
