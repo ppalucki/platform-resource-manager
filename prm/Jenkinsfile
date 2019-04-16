@@ -76,14 +76,15 @@ pipeline {
                     sleep 30
                 }
                 dir('prm'){
-                    echo 'calcuate results'
-                    sh 'pipenv run python calculate_accuracy.py --prometheus ${PROMETHEUS} ${BUILD_NUMBER}'
+                    echo 'Calcuate results'
+                    sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc'
                 }
             }
             post {
                 always {
                     echo 'stop workloads'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    junit 'prm/unit_results.xml'
                 }
             }
         }
@@ -102,7 +103,14 @@ pipeline {
                 }
                 dir('prm'){
                     echo 'calcuate results'
-                    sh 'pipenv run python calculate_accuracy.py --prometheus ${PROMETHEUS} ${BUILD_NUMBER}'
+                    sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw'
+                }
+            }
+            post {
+                always {
+                    echo 'stop workloads'
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    junit 'prm/unit_results.xml'
                 }
             }
         }

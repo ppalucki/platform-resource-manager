@@ -15,9 +15,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
+import os
+
 from argparse import ArgumentParser
 
-from prm.accuracy import build_prometheus_url, fetch_metrics, calculate_components, calculate_precision_and_recall
+from prm.accuracy import (build_prometheus_url, fetch_metrics,
+                          calculate_components, calculate_precision_and_recall)
 
 
 def main():
@@ -34,8 +38,24 @@ def main():
     anomalies = fetch_metrics(url)
     true_positives, anomaly_count, slo_violations = calculate_components(
         anomalies, args.prometheus, args.build_number, args.window_size)
-    precision, recall = calculate_precision_and_recall(true_positives, anomaly_count, slo_violations)
+    precision, recall = calculate_precision_and_recall(
+        true_positives, anomaly_count, slo_violations)
     print(precision, recall)
+
+
+def test_integration_accurracy():
+    prometheus = os.environ['PROMETHEUS']
+    build_number = int(os.environ['BUILD_NUMBER'])
+    window_size = 10.0
+    url = build_prometheus_url(prometheus, 'anomaly', build_number)
+    anomalies = fetch_metrics(url)
+    true_positives, anomaly_count, slo_violations = calculate_components(
+        anomalies, prometheus, build_number, window_size)
+    precision, recall = calculate_precision_and_recall(
+        true_positives, anomaly_count, slo_violations)
+
+    assert precision > 0
+    assert recall > 0
 
 
 if __name__ == "__main__":
