@@ -63,30 +63,28 @@ pipeline {
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
             steps {
-                stage("Restart owca service with labels") {
-                    steps {
-                        contentReplace(
+                echo 'Restart owca'
+                contentReplace(
+                    configs: [
+                        fileContentReplaceConfig(
                             configs: [
-                                fileContentReplaceConfig(
-                                    configs: [
-                                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1),
-                                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1),
-                                        fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 1)
-                                    ],
-                                    fileEncoding: 'UTF-8', 
-                                    filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml")
-                                ])
-                        sh'''
-                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
-                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
-                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
-                        sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
-                        sudo systemctl restart owca
-                        '''
-                        sleep 5
-                        sh 'sudo systemctl status owca'
-                    }
-                }
+                                fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1),
+                                fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1),
+                                fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 1)
+                            ],
+                            fileEncoding: 'UTF-8', 
+                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml")
+                        ])
+                sh'''
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
+                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
+                sudo systemctl restart owca
+                '''
+                sleep 5
+                sh 'sudo systemctl status owca'
+
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
@@ -138,31 +136,32 @@ pipeline {
                 BUILD_SCENARIO = "mbw"
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
+
+
             steps {
-                stage("Restart owca service with labels") {
-                    steps {
-                        contentReplace(
+
+                echo 'Restart owca'
+                contentReplace(
+                    configs: [
+                        fileContentReplaceConfig(
                             configs: [
-                                fileContentReplaceConfig(
-                                    configs: [
-                                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1),
-                                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1),
-                                        fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 1)
-                                    ],
-                                    fileEncoding: 'UTF-8', 
-                                    filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml")
-                                ])
-                        sh'''
-                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
-                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
-                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
-                        sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
-                        sudo systemctl restart owca
-                        '''
-                        sleep 5
-                        sh 'sudo systemctl status owca'
-                    }
-                }
+                                fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1),
+                                fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1),
+                                fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 1)
+                            ],
+                            fileEncoding: 'UTF-8', 
+                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml")
+                        ])
+                sh'''
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
+                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
+                sudo systemctl restart owca
+                '''
+                sleep 5
+                sh 'sudo systemctl status owca'
+
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
