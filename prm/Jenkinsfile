@@ -108,7 +108,7 @@ pipeline {
                                 url: ''
                             ]
                         ],
-                       group: 'PRM performance v2',
+                       group: 'PRM performance v3',
                        title: 'LLC complex scenario',
                        numBuilds: '5',
                     )
@@ -188,7 +188,7 @@ pipeline {
                                 url: ''
                             ]
                         ],
-                       group: 'PRM performance v2',
+                       group: 'PRM performance v3',
                        title: 'MBW complex scenario',
                        numBuilds: '5',
                     )
