@@ -106,8 +106,6 @@ pipeline {
                        group: 'PRM performance v2',
                        title: 'LLC complex scenario',
                        numBuilds: '5',
-                       width: 1000,
-                       height: 1000
                     )
                     echo 'Storing LLC results.'
                     junit 'prm/unit_results.xml'
@@ -155,8 +153,6 @@ pipeline {
                        group: 'PRM performance v2',
                        title: 'MBW complex scenario',
                        numBuilds: '5',
-                       width: 1000,
-                       height: 1000
                     )
                     echo 'Storing MBW results.'
                     junit 'prm/unit_results.xml'
