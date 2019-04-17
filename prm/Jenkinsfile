@@ -87,7 +87,7 @@ pipeline {
                 }
                 dir('prm'){
                     echo 'Calculate precision and recall...'
-                    sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug"
+                    sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug --log-cli-level=debug -v"
                 }
             }
             post {
@@ -167,7 +167,7 @@ pipeline {
                 }
                 dir('prm'){
                     echo 'Calculate precision and recall...'
-                    sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug"
+                    sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug --log-cli-level=debug -v"
                 }
             }
             post {
