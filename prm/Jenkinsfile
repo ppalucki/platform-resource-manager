@@ -20,22 +20,14 @@ pipeline {
         booleanParam(name: 'MB', defaultValue: true, description: 'Run MBW experiment')
     }
     stages {
-        stage('Redeploy pex') {
-            when {
-                expression { return params.BUILD_PEX }
-            }
+        stage('Build pex') {
+            when { expression { return params.BUILD_PEX } }
             stages {
-                stage("Prepare venv") {
+                stage("Prepare venv && build pex") {
                     steps {
                         dir('prm') {
                             sh('make venv')
                             sh('make check')
-                        }
-                    }
-                }
-                stage("Build owca-prm.pex") {
-                    steps {
-                        dir('prm') {
                             sh('make package')
                         }
                     }
@@ -52,9 +44,7 @@ pipeline {
             }
         }
         stage("Run LLC experiment") {
-            when {
-                expression { return params.LLC }
-            }
+            when { expression { return params.LLC } }
             environment {
                 MESOS_EXPECTED_TASKS = -1
                 MIN_RECALL = -1
