@@ -97,7 +97,7 @@ pipeline {
                             [
                                 displayTableFlag: false,
                                 exclusionValues: '',
-                                inclusionFlag: 'OFF'
+                                inclusionFlag: 'OFF',
                                 file: 'prm/test_results.csv',
                                 url: ''
                             ]
