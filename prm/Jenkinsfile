@@ -71,32 +71,36 @@ pipeline {
             environment {
                 MESOS_EXPECTED_TASKS = 13
             }
-            steps {
-                dir('prm/owca/workloads'){
-                    echo 'Start baseline workloads.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
-                    sleep 15
-                    echo 'Start contender workload.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep 30
-                }
-                dir('prm'){
-                    echo "Calculate LLC results for ${BUILD_NUMBER}."
-                    sh 'pipenv run pytest test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
-                }
-            }
+            // steps {
+            //     dir('prm/owca/workloads'){
+            //         echo 'Start baseline workloads.'
+            //         sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+            //         sleep 15
+            //         echo 'Start contender workload.'
+            //         sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+            //         sleep 30
+            //     }
+            //     dir('prm'){
+            //         echo "Calculate LLC results for ${BUILD_NUMBER}."
+            //         sh 'pipenv run pytest test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
+            //     }
+            // }
             post {
                 always {
-                    echo 'Stop all workloads.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    // echo 'Stop all workloads.'
+                    // sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
                     echo 'Plot LLC results.'
-                    plot(csvFileName: 'plot-32d91d63-10d3-4d8e-aeb7-8de5f116346f.csv', 
-                         csvSeries: [[displayTableFlag: true, exclusionValues: '', file: 'prm/test_results.csv', inclusionFlag: 'OFF', url: '']],
-                         group: 'PRM performance', 
-                         style: 'line', 
-                         title: 'Precision & Recall')
-                    echo 'Storing LLC results.'
-                    junit 'prm/unit_results.xml'
+                    plot(
+                        csvSeries: [
+                            [
+                                file: 'prm/test_results.csv',
+                                 inclusionFlag: 'OFF'
+                            ]
+                        ],
+                       group: 'PRM performance',
+                    )
+                    // echo 'Storing LLC results.'
+                    // junit 'prm/unit_results.xml'
 
                 }
             }
