@@ -9,6 +9,7 @@ pipeline {
         MESOS_MASTER_HOST='100.64.176.23'
         BASELINE_SLEEP = 60
         CONTENDER_SLEEP = 60
+        BUILD_COMMIT = GIT_COMMIT
     }
     options {
         disableConcurrentBuilds()
