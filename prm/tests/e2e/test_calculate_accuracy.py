@@ -56,8 +56,8 @@ def test_integration_accurracy(record_property):
     build_number = int(os.environ['BUILD_NUMBER'])
     build_commit = os.environ['BUILD_COMMIT']
     build_scenario = os.environ['BUILD_SCENARIO']
-    tags = dict(build_number=build_number, 
-                build_scenario=build_scenario, 
+    tags = dict(build_number=build_number,
+                build_scenario=build_scenario,
                 build_commit=build_commit)
     mesos_expected_tasks = int(os.environ['MESOS_EXPECTED_TASKS'])
     window_size = float(os.environ.get('WINDOW_SIZE', 10.0))
