@@ -69,8 +69,8 @@ pipeline {
                             configs: [
                                 fileContentReplaceConfig(
                                     configs: [
-                                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1)
-                                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1)
+                                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1),
+                                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1),
                                         fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 1)
                                     ],
                                     fileEncoding: 'UTF-8', 
@@ -145,8 +145,8 @@ pipeline {
                             configs: [
                                 fileContentReplaceConfig(
                                     configs: [
-                                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1)
-                                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1)
+                                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1),
+                                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1),
                                         fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 1)
                                     ],
                                     fileEncoding: 'UTF-8', 
