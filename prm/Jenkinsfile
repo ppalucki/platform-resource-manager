@@ -15,7 +15,7 @@ pipeline {
         timeout(time: 5, unit: 'MINUTES')
     }
     parameters {
-        booleanParam(name: 'REDEPLOY_PEX', defaultValue: true, description: 'Redeploy pex this value')
+        booleanParam(name: 'REDEPLOY_PEX', defaultValue: false, description: 'Redeploy pex this value')
         booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
         booleanParam(name: 'MB', defaultValue: true, description: 'Run MBW experiment')
     }
