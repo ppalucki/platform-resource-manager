@@ -9,4 +9,4 @@ application_hosts:
     role: root
     image_tag: 137e755acf575f296f6e1f79acdefe8bfea0a462
     wrapper_kafka_brokers: 100.64.176.12
-    docker_registry: http://100.64.176.12
+    docker_registry: 100.64.176.12:80
