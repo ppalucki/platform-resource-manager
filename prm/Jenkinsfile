@@ -114,6 +114,8 @@ pipeline {
                     )
                     echo 'Storing LLC results.'
                     junit 'prm/unit_results.xml'
+                    echo 'Stop owca...'
+                    sh 'sudo systemctl stop owca'
                 }
             }
         }
@@ -192,6 +194,8 @@ pipeline {
                     )
                     echo 'Storing MBW results.'
                     junit 'prm/unit_results.xml'
+                    echo 'Stop owca...'
+                    sh 'sudo systemctl stop owca'
                 }
             }
         }
