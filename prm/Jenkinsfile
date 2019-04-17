@@ -15,14 +15,14 @@ pipeline {
         timeout(time: 5, unit: 'MINUTES')
     }
     parameters {
-        booleanParam(name: 'REDEPLOY_PEX', defaultValue: false, description: 'Redeploy pex this value')
+        booleanParam(name: 'BUILD_PEX', defaultValue: false, description: 'Build owca-pex')
         booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
         booleanParam(name: 'MB', defaultValue: true, description: 'Run MBW experiment')
     }
     stages {
         stage('Redeploy pex') {
             when {
-                expression { return params.REDEPLOY_PEX }
+                expression { return params.BUILD_PEX }
             }
             stages {
                 stage("Prepare venv") {
