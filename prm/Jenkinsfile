@@ -71,10 +71,10 @@ pipeline {
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
-                    sleep 30
+                    sleep 300
                     echo 'Start contender workload.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep 30
+                    sleep 60
                 }
                 dir('prm'){
                     echo "Calculate LLC results for ${BUILD_NUMBER}."
