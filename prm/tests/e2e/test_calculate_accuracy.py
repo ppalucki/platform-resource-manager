@@ -46,20 +46,26 @@ def test_integration_accurracy(record_property):
     assert 'MESOS_EXPECTED_TASKS' in os.environ, 'required to check number of tasks running'
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
     assert 'BUILD_NUMBER' in os.environ, 'build number to find proper metircs'
+    assert 'MIN_RECALL' in os.environ
+    assert 'MIN_PRECISION' in os.environ
 
     mesos_master_host = os.environ['MESOS_MASTER_HOST']
     prometheus = os.environ['PROMETHEUS']
     build_number = int(os.environ['BUILD_NUMBER'])
     mesos_expected_tasks = int(os.environ['MESOS_EXPECTED_TASKS'])
     window_size = float(os.environ.get('WINDOW_SIZE', 10.0))
+    min_recall = float(os.environ.get('MIN_RECALL', -1))
+    min_precision = float(os.environ.get('MIN_PRECISION', -1))
 
     logging.info('window size = %s', window_size)
     logging.info('build number = %r', build_number)
+    logging.info('min recall = %s', min_recall)
+    logging.info('min precision = %r', min_precision)
 
     # Check running tasks.
     tasks = _get_mesos_running_tasks(mesos_master_host)
     logging.info('tasks = %s', len(tasks))
-    assert len(tasks) > mesos_expected_tasks, \
+    assert len(tasks) >= mesos_expected_tasks, \
         'invalid number of tasks: %r (expected=%r)' % (len(tasks), mesos_expected_tasks)
 
     # Calculate results.
@@ -86,9 +92,12 @@ def test_integration_accurracy(record_property):
     logging.info('recall = %s', recall)
     logging.info('precision = %s', precision)
 
-    with open('test_results.csv', 'w') as f:
-        f.write('recall,precision,tasks\n')
+    if not os.path.exists('test_results.csv'):
+        with open('test_results.csv', 'w') as f:
+            f.write('recall,precision,tasks\n')
+
+    with open('test_results.csv', 'a') as f:
         f.write('%s,%s,%s\n' % (recall, precision, len(tasks)))
 
-    assert precision > 0
-    assert recall > 0
+    assert precision >= min_precision, 'Excepted to get at least %s' % min_precision
+    assert recall >= min_recall, 'Expected to get at least %s' % min_recall

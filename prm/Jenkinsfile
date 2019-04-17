@@ -70,6 +70,8 @@ pipeline {
             }
             environment {
                 MESOS_EXPECTED_TASKS = -1
+                MIN_RECALL = -1
+                MIN_PRECISION = -1
             }
             steps {
                 dir('prm/owca/workloads'){
@@ -118,6 +120,8 @@ pipeline {
             }
             environment {
                 MESOS_EXPECTED_TASKS = -1
+                MIN_RECALL = -1
+                MIN_PRECISION = -1
             }
             steps {
                 dir('prm/owca/workloads'){
