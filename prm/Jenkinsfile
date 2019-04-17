@@ -16,7 +16,7 @@ pipeline {
         timeout(time: 15, unit: 'MINUTES')
     }
     parameters {
-        booleanParam(name: 'BUILD_PEX', defaultValue: false, description: 'Build owca-pex')
+        booleanParam(name: 'BUILD_PEX', defaultValue: true, description: 'Build owca-pex')
         booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
         booleanParam(name: 'MB', defaultValue: true, description: 'Run MBW experiment')
     }
