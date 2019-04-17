@@ -101,6 +101,14 @@ def test_integration_accurracy(record_property):
     record_property('precision', precision)
     logging.info('recall = %s', recall)
     logging.info('precision = %s', precision)
+
+    if not os.path.exists('test_results.csv'):
+        with open('test_results.csv', 'w') as f:
+            f.write('recall,precision\n')
+
+    with open('test_results.csv', 'a') as f:
+        f.write('%s,%s\n'%(recall, precision))
+
     assert precision > 0
     assert recall > 0
 
