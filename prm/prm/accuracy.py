@@ -19,13 +19,13 @@ from requests import get
 
 _PROMETHEUS_QUERY_PATH = "/api/v1/query"
 _PROMETHEUS_QUERY_RANGE_PATH = "/api/v1/query_range"
-_PROMETHEUS_URL_TPL = '{prometheus}{path}?query={name}{{build_number="{build_number}"'
+_PROMETHEUS_URL_TPL = '{prometheus}{path}?query={name}'
 _PROMETHEUS_TIME_TPL = '&start={start}&end={end}&step=1s'
-_PROMETHEUS_TAG_TPL = ',{key}="{value}"'
+_PROMETHEUS_TAG_TPL = '{key}="{value}"'
 
 
-def build_prometheus_url(prometheus, name, build_number, window_size=None, event_time=None,
-                         tags=dict()):
+def build_prometheus_url(prometheus, name, tags=None, window_size=None, event_time=None):
+    tags = tags or dict()
     path = _PROMETHEUS_QUERY_PATH
     time_range = ''
 
@@ -41,19 +41,19 @@ def build_prometheus_url(prometheus, name, build_number, window_size=None, event
         prometheus=prometheus,
         path=path,
         name=name,
-        build_number=build_number
     )
 
     # Prepare additional tags for query.
     query_tags = []
     for k, v in tags.items():
         query_tags.append(_PROMETHEUS_TAG_TPL.format(key=k, value=v))
-    query_tags_str = ''.join(query_tags)
+    query_tags_str = ','.join(query_tags)
 
     # Build final URL from all the components.
-    url = ''.join([url, query_tags_str, "}", time_range])
+    url = ''.join([url, "{", query_tags_str, "}", time_range])
 
     return url
+
 
 
 def fetch_metrics(url):
@@ -63,7 +63,8 @@ def fetch_metrics(url):
 
 
 def calculate_components(anomalies, prometheus, build_number, violation_window_size):
-    slo_violations_url = build_prometheus_url(prometheus, 'sli>slo', build_number)
+    slo_violations_url = build_prometheus_url(prometheus, 'sli>slo',
+                                              dict(build_number=build_number))
     slo_violations_metrics = fetch_metrics(slo_violations_url)
     slo_violations = 0
     for metric in slo_violations_metrics['data']['result']:
@@ -75,10 +76,16 @@ def calculate_components(anomalies, prometheus, build_number, violation_window_s
         for anomaly in metric['values']:
             anomalies_found += 1
             anomaly_slo_violations_url = \
-                build_prometheus_url(prometheus, 'sli>slo', build_number, event_time=anomaly[0],
-                                     window_size=violation_window_size,
-                                     tags={'workload_instance': metric['metric']
-                                     ['workload_instance']})
+                build_prometheus_url(
+                    prometheus,
+                    'sli>slo',
+                    dict(
+                        build_number=build_number,
+                        workload_instance=metric['metric']['workload_instance'],
+                    ),
+                    event_time=anomaly[0],
+                    window_size=violation_window_size
+                )
             anomaly_slo_violations = fetch_metrics(anomaly_slo_violations_url)
             for _ in anomaly_slo_violations['data']['result']:
                 true_positives += 1

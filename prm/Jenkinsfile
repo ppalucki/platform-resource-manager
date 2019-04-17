@@ -14,8 +14,8 @@ pipeline {
         timeout(time: 5, unit: 'MINUTES')
     }
     parameters {
-        booleanParam(name: 'REDEPLOY_PEX', defaultValue: true, description: 'Redeploy pex this value')
-        booleanParam(name: 'LLC', defaultValue: false, description: 'Run LLC experiment')
+        booleanParam(name: 'REDEPLOY_PEX', defaultValue: false, description: 'Redeploy pex this value')
+        booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
         booleanParam(name: 'MB', defaultValue: false, description: 'Run LLC experiment')
     }
     stages {
@@ -78,7 +78,7 @@ pipeline {
                 }
                 dir('prm'){
                     echo "Calculate LLC results for ${BUILD_NUMBER}."
-                    sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
+                    sh 'pipenv run pytest test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
                 }
             }
             post {
@@ -90,34 +90,34 @@ pipeline {
                 }
             }
         }
-        stage("Run Memory Bandwidth experiment") {
-            when {
-                expression { return params.MB }
-            }
-            steps {
-                dir('prm/owca/workloads'){
-                    echo 'Start baseline workloads.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
-                    sleep 30
-                    echo 'Start contender workload.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep 30
-
-                }
-                dir('prm'){
-                    echo "Calculate MBW results for ${BUILD_NUMBER}."
-                    sh 'pipenv run pytest calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw --log-level=debug'
-                }
-            }
-            post {
-                always {
-                    echo 'Stop all workloads.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
-                    echo 'Storing MBW results.'
-                    junit 'prm/unit_results.xml'
-                }
-            }
-        }
+        // stage("Run Memory Bandwidth experiment") {
+        //     when {
+        //         expression { return params.MB }
+        //     }
+        //     steps {
+        //         dir('prm/owca/workloads'){
+        //             echo 'Start baseline workloads.'
+        //             sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
+        //             sleep 30
+        //             echo 'Start contender workload.'
+        //             sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+        //             sleep 30
+        //
+        //         }
+        //         dir('prm'){
+        //             echo "Calculate MBW results for ${BUILD_NUMBER}."
+        //             sh 'pipenv run pytest test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw --log-level=debug'
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             echo 'Stop all workloads.'
+        //             sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+        //             echo 'Storing MBW results.'
+        //             junit 'prm/unit_results.xml'
+        //         }
+        //     }
+        // }
         stage("Clean all jobs") {
             when { expression { return params.MB | params.LLC} }
             steps {

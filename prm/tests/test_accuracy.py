@@ -37,8 +37,9 @@ from prm.accuracy import build_prometheus_url, calculate_components, calculate_p
 ])
 def test_build_prometheus_url(prometheus, name, build_number, window_size,
                               event_time, tags, expected_url):
-    assert expected_url == build_prometheus_url(prometheus, name, build_number,
-                                                window_size, event_time, tags)
+    tags = dict(build_number=build_number, **tags)
+    assert expected_url == build_prometheus_url(prometheus, name, tags,
+                                                window_size, event_time)
 
 
 def _dict_from_json(path):
