@@ -69,7 +69,7 @@ pipeline {
                 expression { return params.LLC }
             }
             environment {
-                MESOS_EXPECTED_TASKS = 12
+                MESOS_EXPECTED_TASKS = 13
             }
             steps {
                 dir('prm/owca/workloads'){
@@ -78,7 +78,7 @@ pipeline {
                     sleep 15
                     echo 'Start contender workload.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep 15
+                    sleep 30
                 }
                 dir('prm'){
                     echo "Calculate LLC results for ${BUILD_NUMBER}."
