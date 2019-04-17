@@ -83,18 +83,18 @@ pipeline {
                 dir('prm'){
                     echo "Calculate LLC results for ${BUILD_NUMBER}."
                     sh 'pipenv run pytest test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
-                    // Plot perfomrance data
-                    plot(csvFileName: 'plot-32d91d63-10d3-4d8e-aeb7-8de5f116346f.csv', 
-                         csvSeries: [[displayTableFlag: true, exclusionValues: '', file: 'test_results.csv', inclusionFlag: 'OFF', url: '']], 
-                         group: 'PRM performance', 
-                         style: 'line', 
-                         title: 'Precision & Recall')
                 }
             }
             post {
                 always {
                     echo 'Stop all workloads.'
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    echo 'Plot LLC results.'
+                    plot(csvFileName: 'plot-32d91d63-10d3-4d8e-aeb7-8de5f116346f.csv', 
+                         csvSeries: [[displayTableFlag: true, exclusionValues: '', file: 'test_results.csv', inclusionFlag: 'OFF', url: '']], 
+                         group: 'PRM performance', 
+                         style: 'line', 
+                         title: 'Precision & Recall')
                     echo 'Storing LLC results.'
                     junit 'prm/unit_results.xml'
 

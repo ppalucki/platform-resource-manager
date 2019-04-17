@@ -45,7 +45,7 @@ def main():
         true_positives, anomaly_count, slo_violations)
     print(precision, recall)
 
-def _get_running_tasks(mesos_master_host):
+def _get_mesos_running_tasks(mesos_master_host):
     tasks_response = requests.post(
         'http://%s:5050/api/v1' % mesos_master_host, 
         data='{"type": "GET_TASKS"}', 
@@ -53,10 +53,10 @@ def _get_running_tasks(mesos_master_host):
     )
     tasks_response.raise_for_status()
     tasks = tasks_response.json()
-    if not 'tasks' in tasks['get_tasks']:
+    if 'tasks' not in tasks['get_tasks']:
         return []
     else:
-        sorted([t['name'] for t in tasks['get_tasks']['tasks']])
+        return sorted([t['name'] for t in tasks['get_tasks']['tasks']])
 
 def test_workloads_are_running():
     assert 'MESOS_MASTER_HOST' in os.environ
@@ -65,7 +65,7 @@ def test_workloads_are_running():
     mesos_master_host = os.environ['MESOS_MASTER_HOST']
     mesos_expected_tasks = int(os.environ['MESOS_EXPECTED_TASKS'])
 
-    tasks = _get_running_tasks(mesos_master_host)
+    tasks = _get_mesos_running_tasks(mesos_master_host)
 
     logging.debug('found tasks:', tasks)
     assert len(tasks) == mesos_expected_tasks
