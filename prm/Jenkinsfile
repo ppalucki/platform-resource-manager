@@ -71,7 +71,7 @@ pipeline {
             environment {
                 MESOS_EXPECTED_TASKS = 13
             }
-            // steps {
+            steps {
             //     dir('prm/owca/workloads'){
             //         echo 'Start baseline workloads.'
             //         sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
@@ -84,7 +84,7 @@ pipeline {
             //         echo "Calculate LLC results for ${BUILD_NUMBER}."
             //         sh 'pipenv run pytest test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
             //     }
-            // }
+            }
             post {
                 always {
                     // echo 'Stop all workloads.'
