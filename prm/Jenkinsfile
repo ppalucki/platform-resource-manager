@@ -89,10 +89,10 @@ pipeline {
                 always {
                     // echo 'Stop all workloads.'
                     // sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
-                    csvFileName: 'results.csv',
-                    style: 'line',
                     echo 'Plot LLC results.'
                     plot(
+                        csvFileName: 'results.csv',
+                        style: 'line',
                         csvSeries: [
                             [
                                 displayTableFlag: false,
