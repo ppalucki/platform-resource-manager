@@ -52,7 +52,7 @@ Before you run the demo scenarios, you must have completed the following:
 
     # or complex_mbw.0
     ansible-playbook -l $REMOTE_IP -i demo_scenarios/complex_mbw.0/inventory.yaml -i $cinventory $playbook \
-      --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_training,cassandra_stress
+      --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress
     ```
 
 4.  Reconfigure OWCA by setting `action_delay` to 20 seconds. Then restart it

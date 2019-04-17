@@ -162,7 +162,7 @@ pipeline {
                     sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
                     sleep BASELINE_SLEEP
                     echo 'Start contender workload.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep CONTENDER_SLEEP
                 }
                 dir('prm'){
