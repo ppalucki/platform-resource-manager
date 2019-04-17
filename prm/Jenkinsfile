@@ -9,8 +9,8 @@ pipeline {
         MESOS_MASTER_HOST='100.64.176.23'
         LLC_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_llc.0\"}}"
         MBW_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_mbw.0\"}}"
-        BASELINE_SLEEP = 15
-        CONTENDER_SLEEP = 15
+        BASELINE_SLEEP = 60
+        CONTENDER_SLEEP = 60
     }
     options {
         disableConcurrentBuilds()
@@ -92,8 +92,8 @@ pipeline {
             post {
                 always {
                     echo 'Stop all workloads.'
-                    // sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
-                    // sleep 5
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    sleep 5
                     echo 'Plot LLC results.'
                     plot(
                         csvFileName: 'llc_results.csv',
@@ -141,8 +141,9 @@ pipeline {
             }
             post {
                 always {
-                    // echo 'Stop all workloads.'
-                    // sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    echo 'Stop all workloads.'
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    sleep 5
                     echo 'Plot MBW results.'
                     plot(
                         csvFileName: 'mbw_results.csv',
