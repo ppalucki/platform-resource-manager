@@ -63,7 +63,7 @@ def test_workloads_are_running():
     assert 'MESOS_EXPECTED_TASKS' in os.environ
 
     mesos_master_host = os.environ['MESOS_MASTER_HOST']
-    mesos_expected_tasks = int(os.environ['MESOS_MASTER_HOST'])
+    mesos_expected_tasks = int(os.environ['MESOS_EXPECTED_TASKS'])
 
     tasks = _get_running_tasks(mesos_master_host)
 
@@ -83,8 +83,9 @@ def test_integration_accurracy(record_property):
 
     logging.info('window size = %s', window_size)
     logging.info('build number = %r', build_number)
-    url = build_prometheus_url(prometheus, 'anomaly', build_number)
-    anomalies = fetch_metrics(url)
+    prometheus_query = build_prometheus_url(prometheus, 'anomaly', dict(build_number=build_number))
+    logging.info('prometheus query = %r', prometheus_query)
+    anomalies = fetch_metrics(prometheus_query)
     logging.info('found anomalies = %s', len(anomalies))
 
     true_positives, anomaly_count, slo_violations = calculate_components(
