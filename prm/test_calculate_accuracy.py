@@ -45,20 +45,30 @@ def main():
         true_positives, anomaly_count, slo_violations)
     print(precision, recall)
 
-
-def test_workloads_are_running():
-    # assert 'MESOS_HOST' in os.environ
-    # mesos_host = os.environ['MESOS_HOST']
-    import requests
-    mesos_host = '100.64.176.12'
-    tasks_response = requests.post('http://%s:5050/api/v1' % mesos_host, data='{"type": "GET_TASKS"}', headers={'content-type': 'application/json'})
+def _get_running_tasks(mesos_master_host):
+    tasks_response = requests.post(
+        'http://%s:5050/api/v1' % mesos_master_host, 
+        data='{"type": "GET_TASKS"}', 
+        headers={'content-type': 'application/json'}
+    )
     tasks_response.raise_for_status()
     tasks = tasks_response.json()
-    tasks['get_tasks'].keys()
+    if not 'tasks' in tasks['get_tasks']:
+        return []
+    else:
+        sorted([t['name'] for t in tasks['get_tasks']['tasks']])
 
-    assert 'launched_tasks' in tasks['get_tasks']
-    running_tasks = tasks['get_tasks']['launched_tasks']
-    print(running_tasks)
+def test_workloads_are_running():
+    assert 'MESOS_MASTER_HOST' in os.environ
+    assert 'MESOS_EXPECTED_TASKS' in os.environ
+
+    mesos_master_host = os.environ['MESOS_MASTER_HOST']
+    mesos_expected_tasks = int(os.environ['MESOS_MASTER_HOST'])
+
+    tasks = _get_running_tasks(mesos_master_host)
+
+    logging.debug('found tasks:', tasks)
+    assert len(tasks) == mesos_expected_tasks
 
 
 def test_integration_accurracy(record_property):
