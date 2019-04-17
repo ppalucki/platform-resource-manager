@@ -82,7 +82,7 @@ pipeline {
                 }
                 dir('prm'){
                     echo "Calculate LLC results for ${BUILD_NUMBER}."
-                    sh 'pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
+                    sh 'PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
                 }
             }
             post {
@@ -125,7 +125,7 @@ pipeline {
                 }
                 dir('prm'){
                     echo "Calculate MBW results for ${BUILD_NUMBER}."
-                    sh 'pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw --log-level=debug'
+                    sh 'PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw --log-level=debug'
                 }
             }
             post {
