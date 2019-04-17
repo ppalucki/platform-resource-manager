@@ -59,7 +59,7 @@ application_hosts:
       redis_rpc_perf:
         default:
           count: 3
-          slo: 100000
+          slo: 10000
           communication_port: 6789
           redis:
             image_name: centos/redis
