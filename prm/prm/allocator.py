@@ -59,7 +59,7 @@ class ResourceAllocator(Allocator):
         self.ucols = ['time', 'cid', 'name', Metric.UTIL]
         self.mcols = ['time', 'cid', 'name', Metric.CYC, Metric.INST,
                       Metric.L3MISS, Metric.L3OCC, Metric.MB, Metric.CPI,
-                      Metric.L3MPKI, Metric.NF, Metric.UTIL]
+                      Metric.L3MPKI, Metric.NF, Metric.UTIL, Metric.MSPKI]
         if mode_config == ResourceAllocator.COLLECT_MODE:
             self.analyzer = Analyzer()
             self.workload_meta = {}
@@ -75,10 +75,11 @@ class ResourceAllocator(Allocator):
             self.analyzer.build_model()
             self.cpuc = CpuCycle(self.analyzer.get_lcutilmax(), 0.5, False)
             self.l3c = LlcOccup(self.exclusive_cat)
+            self.mbc_enabled = True
             self.mbc = MemoryBw()
             cpuc_controller = NaiveController(self.cpuc, 15)
-            llc_controller = NaiveController(self.l3c, 3)
-            mb_controller = NaiveController(self.mbc, 3)
+            llc_controller = NaiveController(self.l3c, 4)
+            mb_controller = NaiveController(self.mbc, 4)
             self.controllers = {ContendedResource.CPUS: cpuc_controller,
                                 ContendedResource.LLC: llc_controller,
                                 ContendedResource.MEMORY_BW: mb_controller}
@@ -301,7 +302,8 @@ class ResourceAllocator(Allocator):
                         self.cpuc.set_share(cid, 0.0)
                         self.cpuc.budgeting([cid], [])
                         self.l3c.budgeting([cid], [])
-                        self.mbc.budgeting([cid], [])
+                        if self.mbc_enabled:
+                            self.mbc.budgeting([cid], [])
                     else:
                         self.cpuc.set_share(cid, 1000)
                         if self.exclusive_cat:
@@ -375,10 +377,12 @@ class ResourceAllocator(Allocator):
             self.l3c.update_allocs(tasks_allocs, allocs, platform.rdt_information.cbm_mask, platform.sockets)
 
             if platform.rdt_information.rdt_mb_control_enabled:
+                self.mbc_enabled = True
                 self.mbc.update_allocs(tasks_allocs, allocs, platform.rdt_information.mb_min_bandwidth,
                                    	platform.rdt_information.mb_bandwidth_gran, platform.sockets)
             else:
-                self.controllers[ContendedResource.MEMORY_BW] = self.cpuc
+                self.mbc_enabled = False
+                self.controllers[ContendedResource.MEMORY_BW] = self.controllers[ContendedResource.CPUS]
                 
         metric_list = []
         metric_list.extend(self._get_threshold_metrics())
