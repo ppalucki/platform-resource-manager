@@ -7,8 +7,6 @@ pipeline {
         MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
-        LLC_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_llc.0\"}}"
-        MBW_LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", scenario: \"complex_mbw.0\"}}"
         BASELINE_SLEEP = 60
         CONTENDER_SLEEP = 60
     }
@@ -42,19 +40,6 @@ pipeline {
                         }
                     }
                 }
-                stage("Restart owca service") {
-                    steps {
-                        sh'''
-                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
-                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
-                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
-                        sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
-                        sudo systemctl restart owca
-                        '''
-                        sleep 5
-                        sh 'sudo systemctl status owca'
-                    }
-                }
             }
         }
         stage("Prepare aurora cluster") {
@@ -74,19 +59,45 @@ pipeline {
                 MESOS_EXPECTED_TASKS = -1
                 MIN_RECALL = -1
                 MIN_PRECISION = -1
+                BUILD_SCENARIO = "llc"
+                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
             steps {
+                stage("Restart owca service with labels") {
+                    steps {
+                        contentReplace(
+                            configs: [
+                                fileContentReplaceConfig(
+                                    configs: [
+                                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1)
+                                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1)
+                                        fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 1)
+                                    ],
+                                    fileEncoding: 'UTF-8', 
+                                    filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml")
+                                ])
+                        sh'''
+                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
+                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
+                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
+                        sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
+                        sudo systemctl restart owca
+                        '''
+                        sleep 5
+                        sh 'sudo systemctl status owca'
+                    }
+                }
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep BASELINE_SLEEP
                     echo 'Start contender workload.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LLC_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep CONTENDER_SLEEP
                 }
                 dir('prm'){
-                    echo "Calculate LLC results for ${BUILD_NUMBER}."
-                    sh 'PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=llc --log-level=debug'
+                    echo "Calculate ${BUILD_SCENARIO} results for ${BUILD_NUMBER}."
+                    sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug"
                 }
             }
             post {
@@ -124,19 +135,45 @@ pipeline {
                 MESOS_EXPECTED_TASKS = -1
                 MIN_RECALL = -1
                 MIN_PRECISION = -1
+                BUILD_SCENARIO = "mbw"
+                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
             steps {
+                stage("Restart owca service with labels") {
+                    steps {
+                        contentReplace(
+                            configs: [
+                                fileContentReplaceConfig(
+                                    configs: [
+                                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 1)
+                                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 1)
+                                        fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 1)
+                                    ],
+                                    fileEncoding: 'UTF-8', 
+                                    filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml")
+                                ])
+                        sh'''
+                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
+                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
+                        sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
+                        sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
+                        sudo systemctl restart owca
+                        '''
+                        sleep 5
+                        sh 'sudo systemctl status owca'
+                    }
+                }
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
                     sleep BASELINE_SLEEP
                     echo 'Start contender workload.'
-                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${MBW_LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                    sh 'ansible-playbook -v -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction--stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep CONTENDER_SLEEP
                 }
                 dir('prm'){
-                    echo "Calculate MBW results for ${BUILD_NUMBER}."
-                    sh 'PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=mbw --log-level=debug'
+                    echo "Calculate ${BUILD_SCENARIO} results for ${BUILD_NUMBER}."
+                    sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug"
                 }
             }
             post {
