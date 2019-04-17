@@ -69,7 +69,7 @@ pipeline {
                 expression { return params.LLC }
             }
             environment {
-                MESOS_EXPECTED_TASKS = 15
+                MESOS_EXPECTED_TASKS = 12
             }
             steps {
                 dir('prm/owca/workloads'){

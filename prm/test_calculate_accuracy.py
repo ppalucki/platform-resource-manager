@@ -67,7 +67,7 @@ def test_workloads_are_running():
 
     tasks = _get_mesos_running_tasks(mesos_master_host)
 
-    logging.debug('found tasks:', tasks)
+    logging.debug('found tasks: %s', tasks)
     assert len(tasks) == mesos_expected_tasks
 
 
