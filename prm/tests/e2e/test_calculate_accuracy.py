@@ -45,13 +45,20 @@ def test_integration_accurracy(record_property):
     assert 'MESOS_MASTER_HOST' in os.environ, 'required to get number of running tasks'
     assert 'MESOS_EXPECTED_TASKS' in os.environ, 'required to check number of tasks running'
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
-    assert 'BUILD_NUMBER' in os.environ, 'build number to find proper metircs'
+    assert 'BUILD_NUMBER' in os.environ
+    assert 'BUILD_COMMIT' in os.environ
+    assert 'BUILD_SCENARIO' in os.environ
     assert 'MIN_RECALL' in os.environ
     assert 'MIN_PRECISION' in os.environ
 
     mesos_master_host = os.environ['MESOS_MASTER_HOST']
     prometheus = os.environ['PROMETHEUS']
     build_number = int(os.environ['BUILD_NUMBER'])
+    build_commit = os.environ['BUILD_COMMIT']
+    build_scenario = os.environ['BUILD_SCENARIO']
+    tags = dict(build_number=build_number, 
+                build_scenario=build_scenario, 
+                build_commit=build_commit)
     mesos_expected_tasks = int(os.environ['MESOS_EXPECTED_TASKS'])
     window_size = float(os.environ.get('WINDOW_SIZE', 10.0))
     min_recall = float(os.environ.get('MIN_RECALL', -1))
@@ -69,14 +76,13 @@ def test_integration_accurracy(record_property):
         'invalid number of tasks: %r (expected=%r)' % (len(tasks), mesos_expected_tasks)
 
     # Calculate results.
-    prometheus_anomalies_query = build_prometheus_url(
-        prometheus, 'anomaly', dict(build_number=build_number))
+    prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly', tags)
     logging.debug('prometheus query = %r', prometheus_anomalies_query)
     anomalies = fetch_metrics(prometheus_anomalies_query)
     logging.info('found anomalies = %s', len(anomalies))
 
     true_positives, anomaly_count, slo_violations = calculate_components(
-        anomalies, prometheus, build_number, window_size)
+        anomalies, prometheus, tags, window_size)
     logging.debug('found true positives = %s', true_positives)
     logging.debug('found anomaly count = %s', anomaly_count)
     logging.debug('found slo violations count = %s', slo_violations)

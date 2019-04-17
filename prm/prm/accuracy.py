@@ -62,9 +62,8 @@ def fetch_metrics(url):
     return response.json()
 
 
-def calculate_components(anomalies, prometheus, build_number, violation_window_size):
-    slo_violations_url = build_prometheus_url(prometheus, 'sli>slo',
-                                              dict(build_number=build_number))
+def calculate_components(anomalies, prometheus, tags, violation_window_size):
+    slo_violations_url = build_prometheus_url(prometheus, 'sli>slo', tags)
     slo_violations_metrics = fetch_metrics(slo_violations_url)
     slo_violations = 0
     for metric in slo_violations_metrics['data']['result']:
@@ -73,16 +72,14 @@ def calculate_components(anomalies, prometheus, build_number, violation_window_s
     true_positives = 0
     anomalies_found = 0
     for metric in anomalies['data']['result']:
+        workload_instance = metric['metric']['workload_instance']
         for anomaly in metric['values']:
             anomalies_found += 1
             anomaly_slo_violations_url = \
                 build_prometheus_url(
                     prometheus,
                     'sli>slo',
-                    dict(
-                        build_number=build_number,
-                        workload_instance=metric['metric']['workload_instance'],
-                    ),
+                    dict(tags, **dict(workload_instance=workload_instance)),
                     event_time=anomaly[0],
                     window_size=violation_window_size
                 )

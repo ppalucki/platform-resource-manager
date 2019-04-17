@@ -128,8 +128,8 @@ def test_calculate_components(anomalies, requests, expected_true_positives,
                               expected_anomalies_found, expected_real_positives):
     with patch('prm.accuracy.get',
                Mock(side_effect=lambda url: Mock(Response, json=Mock(return_value=requests[url])))):
-        true_positives, anomalies_found, real_positives = calculate_components(anomalies,
-                                                                               'irrelevant', 1, 10)
+        true_positives, anomalies_found, real_positives = calculate_components(
+            anomalies, 'irrelevant', dict(build_number=1), 10)
 
     assert true_positives == expected_true_positives
     assert anomalies_found == expected_anomalies_found
