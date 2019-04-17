@@ -10,11 +10,11 @@ venv:
 
 flake8: 
 	@echo Checking code quality.
-	pipenv run flake8 owca tests example workloads
+	pipenv run flake8 tests
 
 unit:
 	@echo Running unit tests
-	PYTHONPATH=. pipenv run pytest tests
+	PYTHONPATH=. pipenv run pytest tests/unit
 
 package: 
 	@echo Building owca-pex file.
