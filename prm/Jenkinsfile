@@ -93,8 +93,11 @@ pipeline {
                     plot(
                         csvSeries: [
                             [
+                                displayTableFlag: false,
+                                exclusionValues: '',
+                                inclusionFlag: 'OFF'
                                 file: 'prm/test_results.csv',
-                                 inclusionFlag: 'OFF'
+                                url: ''
                             ]
                         ],
                        group: 'PRM performance',
