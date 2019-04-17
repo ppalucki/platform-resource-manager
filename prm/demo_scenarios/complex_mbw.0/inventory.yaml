@@ -67,6 +67,7 @@ application_hosts:
           labels: {'type': 'best_efforts'}
           count: 1
           communication_port: 9142
+          storage_port: 7100
           jmx_port: 7299
           slo: 1000
           cassandra:
