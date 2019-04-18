@@ -58,6 +58,7 @@ pipeline {
             }
             steps {
                 echo 'Reconfigure owca...'
+		sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
@@ -67,12 +68,12 @@ pipeline {
                                 fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)
                             ],
                             fileEncoding: 'UTF-8', 
-                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml")
+                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp")
                         ])
                 sh'''
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp /etc/owca/owca_config.yml
                 sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/owca.pex
                 sudo systemctl restart owca
                 '''
@@ -138,6 +139,7 @@ pipeline {
             steps {
 
                 echo 'Reconfigure owca...'
+		sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
@@ -147,12 +149,12 @@ pipeline {
                                 fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)
                             ],
                             fileEncoding: 'UTF-8', 
-                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml")
+                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp")
                         ])
                 sh'''
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp /etc/owca/owca_config.yml
                 sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/owca.pex
                 sudo systemctl restart owca
                 '''
