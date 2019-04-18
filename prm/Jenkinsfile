@@ -73,7 +73,7 @@ pipeline {
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
-                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
+                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/owca.pex
                 sudo systemctl restart owca
                 '''
                 echo 'Restart owca...'
@@ -153,7 +153,7 @@ pipeline {
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml /etc/owca/
-                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/
+                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/owca.pex
                 sudo systemctl restart owca
                 '''
                 sleep 5
