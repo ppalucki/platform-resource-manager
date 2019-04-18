@@ -7,8 +7,8 @@ pipeline {
         MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
-        BASELINE_SLEEP = 300
-        CONTENDER_SLEEP = 120
+        BASELINE_SLEEP = 240
+        CONTENDER_SLEEP = 240
         BUILD_COMMIT = "${GIT_COMMIT}"
     }
     options {
