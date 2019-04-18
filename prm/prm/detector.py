@@ -17,7 +17,7 @@
 import logging
 import json
 import numpy as np
-from tying import List
+from typing import List
 
 from owca import detectors
 from owca.platforms import Platform
