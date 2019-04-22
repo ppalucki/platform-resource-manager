@@ -11,6 +11,7 @@ pipeline {
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
         LLC_BASELINE_SLEEP = 300
+        LLC_COLLECT_SLEEP = 36000
         LLC_CONTENDER_SLEEP = 300
         MBW_BASELINE_SLEEP = 5
         MBW_CONTENDER_SLEEP = 5
@@ -24,6 +25,7 @@ pipeline {
     parameters {
         booleanParam(name: 'BUILD_PEX', defaultValue: true, description: 'Build owca-pex')
         booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
+        booleanParam(name: 'BUILD_LLC_MODEL', defaultValue: false, description: 'Build Model For LLC Contention')
         booleanParam(name: 'MB', defaultValue: true, description: 'Run MBW experiment')
     }
     stages {
@@ -50,6 +52,56 @@ pipeline {
                 '''
             }
         }
+
+        stage("Run LLC Metrics Collection") {
+            when { expression { return params.BUILD_LLC_MODEL } }
+            environment {
+                MESOS_EXPECTED_TASKS = -1
+                BUILD_SCENARIO = "llc"
+                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
+            }
+            steps {
+                echo 'Reconfigure owca...'
+                sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.collect.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
+                contentReplace(
+                    configs: [
+                        fileContentReplaceConfig(
+                            configs: [
+                                fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
+                                fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
+                                fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)
+                            ],
+                            fileEncoding: 'UTF-8', 
+                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp")
+                        ])
+                sh'''
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp /etc/owca/owca_config.yml
+                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/owca.pex
+                sudo systemctl restart owca
+                '''
+                echo 'Restart owca...'
+                sleep 5
+                sh 'sudo systemctl status owca'
+
+                dir('prm/owca/workloads'){
+                    echo 'Start baseline workloads.'
+                    sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                    sleep LLC_COLLECT_SLEEP
+                }
+            }
+            post {
+                always {
+                    echo 'Stop all workloads...'
+                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    echo 'Stop owca...'
+                    sh 'sudo systemctl stop owca'
+                    sh 'cat /var/lib/owca/metric.csv'
+                }
+            }
+        }
+
+
         stage("Run LLC experiment") {
             when { expression { return params.LLC } }
             environment {
@@ -61,7 +113,7 @@ pipeline {
             }
             steps {
                 echo 'Reconfigure owca...'
-		sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
+                sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
