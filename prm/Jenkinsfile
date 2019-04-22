@@ -10,10 +10,12 @@ pipeline {
         MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
-        BASELINE_SLEEP = 5
-        CONTENDER_SLEEP = 5
+        LLC_BASELINE_SLEEP = 300
+        LLC_CONTENDER_SLEEP = 300
+        MBW_BASELINE_SLEEP = 5
+        MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
-	EXTRA_ANSIBLE_PARAMS = ""
+        EXTRA_ANSIBLE_PARAMS = ""
     }
     options {
         disableConcurrentBuilds()
@@ -85,10 +87,10 @@ pipeline {
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep BASELINE_SLEEP
+                    sleep LLC_BASELINE_SLEEP
                     echo 'Start contender workload.'
                     sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep CONTENDER_SLEEP
+                    sleep LLC_CONTENDER_SLEEP
                 }
                 dir('prm'){
                     echo 'Calculate precision and recall...'
@@ -166,10 +168,10 @@ pipeline {
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
-                    sleep BASELINE_SLEEP
+                    sleep MBW_BASELINE_SLEEP
                     echo 'Start contender workload.'
                     sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep CONTENDER_SLEEP
+                    sleep MBW_CONTENDER_SLEEP
                 }
                 dir('prm'){
                     echo 'Calculate precision and recall...'
