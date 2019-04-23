@@ -1,7 +1,7 @@
 pipeline {
-    triggers {
-        cron('H/30 * * * *')
-    }
+//    triggers {
+//        cron('H/30 * * * *')
+//    }
     agent { label 'mesos' }
     environment {
         PLAYBOOK='prm/owca/workloads/run_workloads.yaml'
