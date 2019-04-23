@@ -125,7 +125,6 @@ pipeline {
                             filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp")
                         ])
                 sh'''
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
                 sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp /etc/owca/owca_config.yml
                 sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/owca.pex
