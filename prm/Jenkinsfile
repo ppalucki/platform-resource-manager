@@ -13,9 +13,9 @@ pipeline {
         LLC_COLLECT_SLEEP = 120
         LLC_CONTENDER_SLEEP = 120
 		/* --- */
-        MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+        MBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         MBW_BASELINE_SLEEP = 300
-        LLC_COLLECT_SLEEP = 120
+        MBW_COLLECT_SLEEP = 120
         MBW_CONTENDER_SLEEP = 120
 		/* --- */
         BUILD_COMMIT = "${GIT_COMMIT}"
@@ -31,8 +31,8 @@ pipeline {
         booleanParam(name: 'BUILD_LLC_MODEL', defaultValue: false, description: 'Build Model For LLC Contention')
         booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
 		/* --- */
-        booleanParam(name: 'BUILD_MB_MODEL', defaultValue: false, description: 'Build Model For MB Contention')
-        booleanParam(name: 'MB', defaultValue: true, description: 'Run MBW experiment')
+        booleanParam(name: 'BUILD_MBW_MODEL', defaultValue: false, description: 'Build Model For MBW Contention')
+        booleanParam(name: 'MBW', defaultValue: true, description: 'Run MBW experiment')
     }
     stages {
         stage('Build pex') {
@@ -50,7 +50,7 @@ pipeline {
             }
         }
         stage("Prepare aurora cluster") {
-            when { expression { return params.MB | params.LLC} }
+            when { expression { return params.MBW | params.LLC} }
             steps {
                 sh'''
                 mkdir -p ${HOME}/.aurora
@@ -182,12 +182,15 @@ pipeline {
         }
 
 		stage("Build model for Memory Bandwidth.") {
-			/* TODO */
-            when { expression { return params.BUILD_MB_MODEL } }
+            when { expression { return params.BUILD_MBW_MODEL } }
+			steps {
+				echo 'Building model for MBW is not yet implemented'
+				/* TODO Add code to build MBW model. */
+			}
 		}
         stage("Run Memory Bandwidth experiment") {
             when {
-                expression { return params.MB }
+                expression { return params.MBW }
             }
             environment {
                 MESOS_EXPECTED_TASKS = -1
@@ -223,10 +226,10 @@ pipeline {
 
                 dir('prm/owca/workloads'){
                     echo 'Start baseline workloads.'
-                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
+                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
                     sleep MBW_BASELINE_SLEEP
                     echo 'Start contender workload.'
-                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep MBW_CONTENDER_SLEEP
                 }
                 dir('prm'){
