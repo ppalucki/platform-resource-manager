@@ -1,20 +1,23 @@
 pipeline {
-//    triggers {
-//        cron('H/30 * * * *')
-//    }
+	/* Disable temporarily */
+    /* triggers { cron('H/30 * * * *') } */
     agent { label 'mesos' }
     environment {
         PLAYBOOK='prm/owca/workloads/run_workloads.yaml'
         INVENTORY='prm/demo_scenarios/common/inventory.yaml'
-        LLC_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-        MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
+		/* --- */
+        LLC_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
         LLC_BASELINE_SLEEP = 300
         LLC_COLLECT_SLEEP = 120
         LLC_CONTENDER_SLEEP = 120
-        MBW_BASELINE_SLEEP = 5
-        MBW_CONTENDER_SLEEP = 5
+		/* --- */
+        MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+        MBW_BASELINE_SLEEP = 300
+        LLC_COLLECT_SLEEP = 120
+        MBW_CONTENDER_SLEEP = 120
+		/* --- */
         BUILD_COMMIT = "${GIT_COMMIT}"
         EXTRA_ANSIBLE_PARAMS = ""
     }
@@ -24,8 +27,11 @@ pipeline {
     }
     parameters {
         booleanParam(name: 'BUILD_PEX', defaultValue: true, description: 'Build owca-pex')
-        booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
+		/* --- */
         booleanParam(name: 'BUILD_LLC_MODEL', defaultValue: false, description: 'Build Model For LLC Contention')
+        booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
+		/* --- */
+        booleanParam(name: 'BUILD_MB_MODEL', defaultValue: false, description: 'Build Model For MB Contention')
         booleanParam(name: 'MB', defaultValue: true, description: 'Run MBW experiment')
     }
     stages {
@@ -53,7 +59,7 @@ pipeline {
             }
         }
 
-        stage("Run LLC Metrics Collection") {
+        stage("Build model for LLC") {
             when { expression { return params.BUILD_LLC_MODEL } }
             environment {
                 MESOS_EXPECTED_TASKS = -1
@@ -99,8 +105,6 @@ pipeline {
                 }
             }
         }
-
-
         stage("Run LLC experiment") {
             when { expression { return params.LLC } }
             environment {
@@ -176,6 +180,11 @@ pipeline {
                 }
             }
         }
+
+		stage("Build model for Memory Bandwidth.") {
+			/* TODO */
+            when { expression { return params.BUILD_MB_MODEL } }
+		}
         stage("Run Memory Bandwidth experiment") {
             when {
                 expression { return params.MB }
@@ -187,12 +196,9 @@ pipeline {
                 BUILD_SCENARIO = "mbw"
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
-
-
             steps {
-
                 echo 'Reconfigure owca...'
-		sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
+				sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
