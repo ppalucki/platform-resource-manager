@@ -80,6 +80,7 @@ def test_integration_accurracy(record_property):
     prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly', tags)
     logging.debug('prometheus query = %r', prometheus_anomalies_query)
     anomalies = fetch_metrics(prometheus_anomalies_query)
+    logging.info('Datected anomalies:\n {}'.format(anomalies))
     logging.info('found anomalies = %s', len(anomalies['data']['result']))
 
     true_positives, anomaly_count, slo_violations = calculate_components(

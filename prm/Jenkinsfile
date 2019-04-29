@@ -14,7 +14,7 @@ pipeline {
         LLC_CONTENDER_SLEEP = 120
 		/* --- */
         MBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
-        MBW_BASELINE_SLEEP = 300
+        MBW_BASELINE_SLEEP = 120
         MBW_COLLECT_SLEEP = 120
         MBW_CONTENDER_SLEEP = 120
 		/* --- */
