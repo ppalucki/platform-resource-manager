@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions
 # and limitations under the License.
-#  
+#
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -41,7 +41,7 @@ def _get_mesos_running_tasks(mesos_master_host):
 
 def test_integration_accurracy(record_property):
     """ Integration tests to check number of runnings tasks during scenario
-    and calculate and output them to csv file for visulization. """
+    and calculate and output them to csv file for visualization. """
     assert 'MESOS_MASTER_HOST' in os.environ, 'required to get number of running tasks'
     assert 'MESOS_EXPECTED_TASKS' in os.environ, 'required to check number of tasks running'
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
@@ -73,7 +73,8 @@ def test_integration_accurracy(record_property):
     tasks = _get_mesos_running_tasks(mesos_master_host)
     logging.info('tasks = %s', len(tasks))
     assert len(tasks) >= mesos_expected_tasks, \
-        'invalid number of tasks: %r (expected=%r)' % (len(tasks), mesos_expected_tasks)
+        'invalid number of tasks: %r (expected=%r)' % (
+            len(tasks), mesos_expected_tasks)
 
     # Calculate results.
     prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly', tags)
@@ -98,7 +99,6 @@ def test_integration_accurracy(record_property):
     logging.info('recall = %s', recall)
     logging.info('precision = %s', precision)
 
-   
     with open('test_results.csv', 'w') as f:
         f.write('recall,precision,tasks,anomaly_count,slo_violations\n')
         f.write('%s,%s,%s,%s,%s\n' % (
