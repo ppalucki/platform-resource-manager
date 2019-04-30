@@ -81,7 +81,7 @@ def test_integration_accurracy(record_property):
     logging.debug('prometheus query = %r', prometheus_anomalies_query)
 
     # Try 50 times to fetch anomalies before considering them non-existent
-    for _ in range(0, 50):
+    for _ in range(0, 100):
         anomalies = fetch_metrics(prometheus_anomalies_query)
         if anomalies['data']['result']:
             logging.info('found anomalies = %s', len(anomalies['data']['result']))
