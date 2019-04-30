@@ -77,7 +77,7 @@ def test_integration_accurracy(record_property):
             len(tasks), mesos_expected_tasks)
 
     # Calculate results.
-    prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly', tags)
+    prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly', tags, 10, 1)
     logging.debug('prometheus query = %r', prometheus_anomalies_query)
 
     # Try 50 times to fetch anomalies before considering them non-existent
