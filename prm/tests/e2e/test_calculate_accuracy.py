@@ -114,4 +114,5 @@ def test_integration_accurracy(record_property):
             recall, precision, len(tasks), anomaly_count, slo_violations))
 
     assert precision >= min_precision, 'Excepted to get at least %s' % min_precision
+
     assert recall >= min_recall, 'Expected to get at least %s' % min_recall
