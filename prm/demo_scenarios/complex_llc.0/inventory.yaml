@@ -87,14 +87,14 @@ application_hosts:
             image_name: cassandra
             image_tag: 3.11.3
             resources:
-              cpu: 20
+              cpu: 30
               ram: 50
               disk: 50
           cassandra_stress:
             env:
-              threads: 16
+              threads: 30
               #qps: @TODO in cassandra_stress.aurora
             resources:
-              cpu: 8
+              cpu: 30
               ram: 20
               disk: 50
