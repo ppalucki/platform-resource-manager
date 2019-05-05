@@ -10,9 +10,9 @@ pipeline {
         MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
-        LLC_BASELINE_SLEEP = 150
+        LLC_BASELINE_SLEEP = 300 
         LLC_COLLECT_SLEEP = 36000
-        LLC_CONTENDER_SLEEP = 150
+        LLC_CONTENDER_SLEEP = 300
         MBW_BASELINE_SLEEP = 5
         MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
@@ -26,7 +26,7 @@ pipeline {
         booleanParam(name: 'BUILD_PEX', defaultValue: true, description: 'Build owca-pex')
         booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
         booleanParam(name: 'BUILD_LLC_MODEL', defaultValue: false, description: 'Build Model For LLC Contention')
-        booleanParam(name: 'MB', defaultValue: true, description: 'Run MBW experiment')
+        booleanParam(name: 'MB', defaultValue: false, description: 'Run MBW experiment')
     }
     stages {
         stage('Build pex') {
