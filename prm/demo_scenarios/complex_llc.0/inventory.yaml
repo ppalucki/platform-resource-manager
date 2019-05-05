@@ -93,6 +93,7 @@ application_hosts:
           cassandra_stress:
             env:
               threads: 30
+              duration: 600
               #qps: @TODO in cassandra_stress.aurora
             resources:
               cpu: 30
