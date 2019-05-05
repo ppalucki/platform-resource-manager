@@ -46,6 +46,7 @@ application_hosts:
               disk: 50
           mutilate:
             env:
+              time: 30
               sli_percentile: 95
               threads: 16
               connections: 16
