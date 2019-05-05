@@ -138,7 +138,7 @@ pipeline {
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep LLC_BASELINE_SLEEP
-                    sed -i ./cassandra_stress/cassandra_stress.aurora 's/number_of_rows=100000/number_of_rows=1000000/g'
+                    sh 'sed -i ./cassandra_stress/cassandra_stress.aurora \'s/number_of_rows=100000/number_of_rows=1000000/g\''
                     echo 'Start contender workload.'
                     sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep LLC_CONTENDER_SLEEP
