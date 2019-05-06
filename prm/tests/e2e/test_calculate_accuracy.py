@@ -82,12 +82,9 @@ def test_integration_accurracy(record_property):
                                                       tags, 3600, time())
     logging.debug('prometheus query = %r', prometheus_anomalies_query)
 
-    # Try 100 times to fetch anomalies before considering them non-existent
-    for _ in range(0, 100):
-        anomalies = fetch_metrics(prometheus_anomalies_query)
-        if anomalies['data']['result']:
-            logging.info('found anomalies = %s', len(anomalies['data']['result']))
-            break
+    anomalies = fetch_metrics(prometheus_anomalies_query)
+    if anomalies['data']['result']:
+        logging.info('found anomalies = %s', len(anomalies['data']['result']))
     else:
         logging.info('No anomalies found.')
         return
@@ -115,5 +112,4 @@ def test_integration_accurracy(record_property):
             recall, precision, len(tasks), anomaly_count, slo_violations))
 
     assert precision >= min_precision, 'Excepted to get at least %s' % min_precision
-
     assert recall >= min_recall, 'Expected to get at least %s' % min_recall
