@@ -136,6 +136,7 @@ pipeline {
 
                 dir('prm/owca/workloads'){
                     sh 'sed s/number_of_rows=100000$/number_of_rows=1000000/g ./cassandra_stress/cassandra_stress.aurora'
+                    sh 'sed s/mixed/write/g ./cassandra_stress/cassandra_stress.aurora'
                     sh 'sed s/-C\\ %d\\;/-C\\ %d\\ -R\\ 40000\\;/g ./mutilate/mutilate.aurora'
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
