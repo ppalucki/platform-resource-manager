@@ -9,7 +9,7 @@ pipeline {
         MESOS_MASTER_HOST='100.64.176.23'
 		/* --- */
         LLC_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-        LLC_BASELINE_SLEEP = 120
+        LLC_BASELINE_SLEEP = 300
         LLC_COLLECT_SLEEP = 120
         LLC_CONTENDER_SLEEP = 120
 		/* --- */

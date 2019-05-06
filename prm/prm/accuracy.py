@@ -24,7 +24,8 @@ _PROMETHEUS_TIME_TPL = '&start={start}&end={end}&step=1s'
 _PROMETHEUS_TAG_TPL = '{key}="{value}"'
 
 
-def build_prometheus_url(prometheus, name, tags=None, window_size=None, event_time=None):
+def build_prometheus_url(prometheus, name, tags=None,
+                         window_size=None, event_time=None):
     tags = tags or dict()
     path = _PROMETHEUS_QUERY_PATH
     time_range = ''
@@ -53,7 +54,6 @@ def build_prometheus_url(prometheus, name, tags=None, window_size=None, event_ti
     url = ''.join([url, "{", query_tags_str, "}", time_range])
 
     return url
-
 
 
 def fetch_metrics(url):
@@ -94,8 +94,6 @@ def calculate_components(anomalies, prometheus, tags, violation_window_size):
 
 
 def calculate_precision_and_recall(true_positives, anomalies_found, slo_violations):
-    precision = 0
-    recall = 0
     if anomalies_found == 0:
         precision = -1
     else:
