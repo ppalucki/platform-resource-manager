@@ -51,7 +51,7 @@ application_hosts:
               threads: 16
               connections: 16
               warmup_time: 30
-              qps: 300000           # that's original value (300k)
+              qps: 100000           # that's original value (300k)
             resources:
               cpu: 16
               ram: 10
