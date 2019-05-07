@@ -38,10 +38,10 @@ application_hosts:
           communication_port: 11213
           twemcache:
             env:
-              worker_threads: 8
+              worker_threads: 12
               max_memory: 2048
             resources:
-              cpu: 8
+              cpu: 12
               ram: 50
               disk: 50
           mutilate:

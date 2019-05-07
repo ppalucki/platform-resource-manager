@@ -10,7 +10,7 @@ pipeline {
         MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
-        LLC_BASELINE_SLEEP = 180 
+        LLC_BASELINE_SLEEP = 300 
         LLC_COLLECT_SLEEP = 36000
         LLC_CONTENDER_SLEEP = 180
         MBW_BASELINE_SLEEP = 5
