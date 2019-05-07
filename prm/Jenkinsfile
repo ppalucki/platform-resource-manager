@@ -10,9 +10,9 @@ pipeline {
         MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
-        LLC_BASELINE_SLEEP = 300 
+        LLC_BASELINE_SLEEP = 180 
         LLC_COLLECT_SLEEP = 36000
-        LLC_CONTENDER_SLEEP = 300
+        LLC_CONTENDER_SLEEP = 180
         MBW_BASELINE_SLEEP = 5
         MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
@@ -135,7 +135,6 @@ pipeline {
                 sh 'sudo systemctl status owca'
 
                 dir('prm/owca/workloads'){
-                    sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 40000\\;/g ./mutilate/mutilate.aurora'
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep LLC_BASELINE_SLEEP

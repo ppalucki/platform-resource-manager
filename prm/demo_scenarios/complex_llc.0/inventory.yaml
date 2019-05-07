@@ -39,7 +39,7 @@ application_hosts:
           twemcache:
             env:
               worker_threads: 4
-              max_memory: 8192
+              max_memory: 2048
             resources:
               cpu: 4
               ram: 50
