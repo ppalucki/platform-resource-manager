@@ -12,8 +12,6 @@ runner: !DetectionRunner
     topic: "owca_anomalies"
     max_timeout_in_seconds: 5.
   detector: !ExampleDetector
-    action_delay: 10
-    mode_config: detect
     
   extra_labels:
     env_uniq_id: "14"
