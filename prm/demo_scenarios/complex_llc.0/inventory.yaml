@@ -9,7 +9,7 @@ application_hosts:
     workloads:
       twemcache_mutilate:
         small:
-          count: 2
+          count: 0
           slo: 500
           communication_port: 11211
           twemcache:
@@ -59,7 +59,7 @@ application_hosts:
 
       redis_rpc_perf:
         default:
-          count: 3
+          count: 0
           slo: 10000
           communication_port: 6789
           redis:
