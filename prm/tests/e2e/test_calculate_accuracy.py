@@ -98,7 +98,6 @@ def test_integration_accurracy(record_property):
     logging.info('recall = %s', recall)
     logging.info('precision = %s', precision)
 
-   
     with open('test_results.csv', 'w') as f:
         f.write('recall,precision,tasks,anomaly_count,slo_violations\n')
         f.write('%s,%s,%s,%s,%s\n' % (
