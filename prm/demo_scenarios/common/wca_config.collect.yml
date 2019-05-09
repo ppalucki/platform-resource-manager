@@ -5,11 +5,11 @@ runner: !DetectionRunner
   action_delay: 10.
   metrics_storage: !KafkaStorage
     brokers_ips: ['100.64.176.12:9092']
-    topic: "owca_metrics"
+    topic: "wca_metrics"
     max_timeout_in_seconds: 5.
   anomalies_storage: !KafkaStorage
     brokers_ips: ['100.64.176.12:9092']
-    topic: "owca_anomalies"
+    topic: "wca_anomalies"
     max_timeout_in_seconds: 5.
   detector: !ContentionDetector
     action_delay: 10
