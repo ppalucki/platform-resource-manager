@@ -253,7 +253,7 @@ def mon_util_cycle(ctx):
                     ctx.cpuq.set_share(con, CpuQuota.CPU_SHARE_LC)
         con.update_cpu_usage()
         if ctx.args.record:
-            with open(Analyzer.UTIL_FILE, 'a') as utilf:
+            with open(Analyzer.UTIL_FILE, 'a+') as utilf:
                 utilf.write(date + ',' + cid + ',' + name +
                             ',' + str(con.utils) + '\n')
 
@@ -267,7 +267,7 @@ def mon_util_cycle(ctx):
 
     loadavg = os.getloadavg()[0]
     if ctx.args.record:
-        with open(Analyzer.UTIL_FILE, 'a') as utilf:
+        with open(Analyzer.UTIL_FILE, 'a+') as utilf:
             utilf.write(date + ',,lcs,' + str(lc_utils) + '\n')
             utilf.write(date + ',,loadavg1m,' + str(loadavg) + '\n')
 

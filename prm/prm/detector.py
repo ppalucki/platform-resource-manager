@@ -236,7 +236,7 @@ class ContentionDetector(detectors.AnomalyDetector):
         row = [str(time), '', 'lcs']
         for i in range(3, len(self.ucols)):
             row.append(str(utils))
-        with open(Analyzer.UTIL_FILE, 'a') as utilf:
+        with open(Analyzer.UTIL_FILE, 'a+') as utilf:
             utilf.write(','.join(row) + '\n')
 
     def _record_metrics(self, time, cid, name, metrics):
