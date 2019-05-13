@@ -3,7 +3,7 @@ pipeline {
     /* triggers { cron('H/30 * * * *') } */
     agent { label 'mesos' }
     environment {
-        PLAYBOOK='prm/owca/workloads/run_workloads.yaml'
+        PLAYBOOK='prm/wca/workloads/run_workloads.yaml'
         INVENTORY='prm/demo_scenarios/common/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
@@ -26,7 +26,7 @@ pipeline {
         timeout(time: 1200, unit: 'MINUTES')
     }
     parameters {
-        booleanParam(name: 'BUILD_PEX', defaultValue: true, description: 'Build owca-pex')
+        booleanParam(name: 'BUILD_PEX', defaultValue: true, description: 'Build wca-pex')
 		/* --- */
         booleanParam(name: 'BUILD_LLC_MODEL', defaultValue: false, description: 'Build Model For LLC Contention')
         booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
@@ -67,8 +67,8 @@ pipeline {
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
             steps {
-                echo 'Reconfigure owca...'
-                sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.collect.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
+                echo 'Reconfigure wca...'
+                sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.collect.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
@@ -78,19 +78,19 @@ pipeline {
                                 fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)
                             ],
                             fileEncoding: 'UTF-8', 
-                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp")
+                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")
                         ])
                 sh'''
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp /etc/owca/owca_config.yml
-                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/owca.pex
-                sudo systemctl restart owca
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/wca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
+                sudo cp ${WORKSPACE}/prm/dist/wca-prm.pex /usr/bin/wca.pex
+                sudo systemctl restart wca
                 '''
-                echo 'Restart owca...'
+                echo 'Restart wca...'
                 sleep 5
-                sh 'sudo systemctl status owca'
+                sh 'sudo systemctl status wca'
 
-                dir('prm/owca/workloads'){
+                dir('prm/wca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep LLC_COLLECT_SLEEP
@@ -100,8 +100,8 @@ pipeline {
                 always {
                     echo 'Stop all workloads...'
                     sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
-                    echo 'Stop owca...'
-                    sh 'sudo systemctl stop owca'
+                    echo 'Stop wca...'
+                    sh 'sudo systemctl stop wca'
                 }
             }
         }
@@ -115,8 +115,8 @@ pipeline {
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
             steps {
-                echo 'Reconfigure owca...'
-                sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
+                echo 'Reconfigure wca...'
+                sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
@@ -126,19 +126,19 @@ pipeline {
                                 fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)
                             ],
                             fileEncoding: 'UTF-8', 
-                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp")
+                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")
                         ])
                 sh'''
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp /etc/owca/owca_config.yml
-                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/owca.pex
-                sudo systemctl restart owca
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/wca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
+                sudo cp ${WORKSPACE}/prm/dist/wca-prm.pex /usr/bin/wca.pex
+                sudo systemctl restart wca
                 '''
-                echo 'Restart owca...'
+                echo 'Restart wca...'
                 sleep 2
-                sh 'sudo systemctl status owca'
+                sh 'sudo systemctl status wca'
 
-                dir('prm/owca/workloads'){
+                dir('prm/wca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep LLC_BASELINE_SLEEP
@@ -175,8 +175,8 @@ pipeline {
                     )
                     echo 'Storing LLC results.'
                     junit 'prm/unit_results.xml'
-                    echo 'Stop owca...'
-                    sh 'sudo systemctl stop owca'
+                    echo 'Stop wca...'
+                    sh 'sudo systemctl stop wca'
                 }
             }
         }
@@ -200,8 +200,8 @@ pipeline {
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
             steps {
-                echo 'Reconfigure owca...'
-				sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp'
+                echo 'Reconfigure wca...'
+				sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
@@ -211,20 +211,20 @@ pipeline {
                                 fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)
                             ],
                             fileEncoding: 'UTF-8', 
-                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp")
+                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")
                         ])
                 sh'''
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/owca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/owca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/owca_config.yml.tmp /etc/owca/owca_config.yml
-                sudo cp ${WORKSPACE}/prm/dist/owca-prm.pex /usr/bin/owca.pex
-                sudo systemctl restart owca
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/wca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/wca/
+                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
+                sudo cp ${WORKSPACE}/prm/dist/wca-prm.pex /usr/bin/wca.pex
+                sudo systemctl restart wca
                 '''
                 sleep 5
-                echo 'Restart owca...'
-                sh 'sudo systemctl status owca'
+                echo 'Restart wca...'
+                sh 'sudo systemctl status wca'
 
-                dir('prm/owca/workloads'){
+                dir('prm/wca/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
                     sleep MBW_BASELINE_SLEEP
@@ -261,8 +261,8 @@ pipeline {
                     )
                     echo 'Storing MBW results.'
                     junit 'prm/unit_results.xml'
-                    echo 'Stop owca...'
-                    sh 'sudo systemctl stop owca'
+                    echo 'Stop wca...'
+                    sh 'sudo systemctl stop wca'
                 }
             }
         }
