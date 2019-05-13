@@ -92,7 +92,7 @@ pipeline {
 
                 dir('prm/wca/workloads'){
                     echo 'Start baseline workloads.'
-                    sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+                    sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra,stress_ng -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep LLC_COLLECT_SLEEP
                 }
             }
