@@ -3,7 +3,7 @@ pipeline {
     /* triggers { cron('H/30 * * * *') } */
     agent { label 'mesos' }
     environment {
-        PLAYBOOK='prm/wca/workloads/run_workloads.yaml'
+        PLAYBOOK='prm/workload-collocation-agent/workloads/run_workloads.yaml'
         INVENTORY='prm/demo_scenarios/common/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
