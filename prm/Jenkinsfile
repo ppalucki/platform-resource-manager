@@ -224,7 +224,7 @@ pipeline {
                 echo 'Restart wca...'
                 sh 'sudo systemctl status wca'
 
-                dir('prm/wca/workloads'){
+                dir('prm/workload-collocation-agent/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress, stress_ng -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
                     sleep MBW_BASELINE_SLEEP
