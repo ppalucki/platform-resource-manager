@@ -72,7 +72,7 @@ class ResourceAllocator(Allocator):
             except Exception as e:
                 log.exception('cannot read workload file - stopped')
                 raise e
-            self.analyzer.build_model()
+            self.analyzer.build_model(verbose=True)
             self.cpuc = CpuCycle(self.analyzer.get_lcutilmax(), 0.5, False)
             self.l3c = LlcOccup(self.exclusive_cat)
             self.mbc_enabled = True
@@ -85,15 +85,16 @@ class ResourceAllocator(Allocator):
                                 ContendedResource.MEMORY_BW: mb_controller}
 
     def _init_data_file(self, data_file, cols):
-        headline = None
-        try:
-            with open(data_file, 'r') as dtf:
-                headline = dtf.readline()
-        except Exception:
-                log.debug('cannot open %r for reading - ignore', data_file)
-        if headline != ','.join(cols) + '\n':
-            with open(data_file, 'w') as dtf:
-                dtf.write(','.join(cols) + '\n')
+        pass
+        # headline = None
+        # try:
+        #     with open(data_file, 'r') as dtf:
+        #         headline = dtf.readline()
+        # except Exception:
+        #         log.debug('cannot open %r for reading - ignore', data_file)
+        # if headline != ','.join(cols) + '\n':
+        #     with open(data_file, 'w') as dtf:
+        #         dtf.write(','.join(cols) + '\n')
 
     def _detect_contenders(self, con: Container, resource: ContendedResource):
         contenders = []
@@ -170,8 +171,8 @@ class ResourceAllocator(Allocator):
             return tasks_labels[cid]['application'] + '.' +\
                     tasks_labels[cid]['application_version_name']
         else:
-            log.debug('no label "application" or "application_version_name" '
-                      'passed to detect function by wca for container: {}'.format(cid))
+            log.warning('no label "application" or "application_version_name" '
+                        'passed to detect function by wca for container: {}'.format(cid))
 
         return None
 
@@ -246,15 +247,15 @@ class ResourceAllocator(Allocator):
         row = [str(time), '', 'lcs']
         for i in range(3, len(self.ucols)):
             row.append(str(utils))
-        with open(Analyzer.UTIL_FILE, 'a') as utilf:
-            utilf.write(','.join(row) + '\n')
+        # with open(Analyzer.UTIL_FILE, 'a') as utilf:
+        #     utilf.write(','.join(row) + '\n')
 
     def _record_metrics(self, time, cid, name, metrics):
         row = [str(time), cid, name]
         for i in range(3, len(self.mcols)):
             row.append(str(metrics[self.mcols[i]]))
-        with open(Analyzer.METRIC_FILE, 'a') as metricf:
-            metricf.write(','.join(row) + '\n')
+        # with open(Analyzer.METRIC_FILE, 'a') as metricf:
+        #     metricf.write(','.join(row) + '\n')
 
     def _update_workload_meta(self):
         with open(ResourceAllocator.WL_META_FILE, 'w') as wlf:
@@ -267,7 +268,7 @@ class ResourceAllocator(Allocator):
         for cid, resources in tasks_resources.items():
             cidset.add(cid)
             if not self._is_be_app(cid, tasks_labels):
-                assigned_cpus += resources['cpus']
+                assigned_cpus += resources.get('cpus', resources.get('requests_cpus', 0))
                 if self.exclusive_cat:
                     self.lcs.add(cid)
             else:

@@ -192,8 +192,8 @@ class Analyzer:
 
     def update_lcutilmax(self, lc_utils):
         self.threshold['lcutilmax'] = lc_utils
-        with open(self.thresh_file, 'w') as threshf:
-            threshf.write(json.dumps(self.threshold))
+        # with open(self.thresh_file, 'w') as threshf:
+        #     threshf.write(json.dumps(self.threshold))
 
     def get_thresh(self, job):
         return self.threshold[job]['thresh'] if job in self.threshold else {}
@@ -217,5 +217,5 @@ class Analyzer:
 
         if verbose:
             log.warn(self.threshold)
-        with open(self.thresh_file, 'w') as threshf:
-            threshf.write(json.dumps(self.threshold))
+        # with open(self.thresh_file, 'w') as threshf:
+        #     threshf.write(json.dumps(self.threshold))

@@ -21,6 +21,12 @@ package:
 	pipenv run env PYTHONPATH=. pex . workload-collocation-agent -v --cache-dir=.pex-build --output=dist/wca-prm.pex -m wca.main:main
 	./dist/wca-prm.pex --version
 
+plugin: 
+	@echo Building wca pex plugin file.
+	-rm dist/prm-plugin.pex
+	-rm .pex-build/prm*
+	-rm -rf prm.egg-info/
+	pipenv run env PYTHONPATH=. pex .  -v --cache-dir=.pex-build --output=dist/prm-plugin.pex
 
 check: flake8
 
