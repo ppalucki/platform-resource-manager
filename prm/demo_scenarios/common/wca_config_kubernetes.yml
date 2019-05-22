@@ -1,7 +1,7 @@
 runner: !DetectionRunner
   rdt_enabled: True
   node: !KubernetesNode
-    kubelet_endpoint: "https://127.0.0.1:10250"
+    kubelet_endpoint: "https://100.64.176.33:10250"
   action_delay: 10.
   metrics_storage: !KafkaStorage
     brokers_ips: ['100.64.176.12:9092']
