@@ -79,7 +79,7 @@ def test_integration_accurracy(record_property):
 
     # Calculate results.
     prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly',
-                                                      tags)
+                                                      tags, 3600, time())
     logging.debug('prometheus query = %r', prometheus_anomalies_query)
 
     anomalies = fetch_metrics(prometheus_anomalies_query)
