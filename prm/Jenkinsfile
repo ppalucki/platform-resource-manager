@@ -58,7 +58,7 @@ pipeline {
             }
             steps {
                 echo 'Reconfigure wca...'
-		sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
+		sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config_kubernetes.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(

@@ -1,0 +1,23 @@
+runner: !DetectionRunner
+  rdt_enabled: True
+  node: !KubernetesNode
+    kubelet_endpoint: "https://127.0.0.1:10250"
+  action_delay: 10.
+  metrics_storage: !KafkaStorage
+    brokers_ips: ['100.64.176.12:9092']
+    topic: "wca_metrics"
+    max_timeout_in_seconds: 5.
+  anomalies_storage: !KafkaStorage
+    brokers_ips: ['100.64.176.12:9092']
+    topic: "wca_anomalies"
+    max_timeout_in_seconds: 5.
+  detector: !ContentionDetector
+    action_delay: 10
+    mode_config: detect
+
+  extra_labels:
+    env_uniq_id: "14"
+    own_ip: "100.64.176.14"
+    build_commit: "BUILD_COMMIT"
+    build_number: "BUILD_NUMBER"
+    build_scenario: "BUILD_SCENARIO"
