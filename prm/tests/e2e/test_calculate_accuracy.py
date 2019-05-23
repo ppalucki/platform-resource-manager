@@ -51,7 +51,7 @@ def test_integration_accurracy(record_property):
     assert 'MIN_PRECISION' in os.environ
     assert 'CRT_PATH' in os.environ
 
-    kubernetes_host = os.environ['KUBERNETES_MASTER_HOST']
+    kubernetes_host = os.environ['KUBERNETES_HOST']
     prometheus = os.environ['PROMETHEUS']
     build_number = int(os.environ['BUILD_NUMBER'])
     build_commit = os.environ['BUILD_COMMIT']
