@@ -25,6 +25,20 @@ from prm.accuracy import (build_prometheus_url, fetch_metrics,
 import requests
 
 
+def _get_kubernetes_running_tasks(kubernetes_host, crt_path):
+    crt = os.path.join(crt_path, 'apiserver-kubelet-client.crt')
+    key = os.path.join(crt_path, 'apiserver-kubelet-client.key')
+    tasks_response = requests.post(
+        'http://%s:10250/pods' % kubernetes_host,
+        data='{"type": "GET_TASKS"}',
+        headers={'content-type': 'application/json'},
+        crt=(crt, key)
+    )
+    tasks_response.raise_for_status()
+    return tasks_response.json()
+
+
+
 def test_integration_accurracy(record_property):
     """ Integration tests to check number of runnings tasks during scenario
     and calculate and output them to csv file for visulization. """
@@ -36,8 +50,9 @@ def test_integration_accurracy(record_property):
     assert 'BUILD_SCENARIO' in os.environ
     assert 'MIN_RECALL' in os.environ
     assert 'MIN_PRECISION' in os.environ
+    assert 'CRT_PATH' in os.environ
 
-    mesos_master_host = os.environ['KUBERNETES_MASTER_HOST']
+    kubernetes_host = os.environ['KUBERNETES_MASTER_HOST']
     prometheus = os.environ['PROMETHEUS']
     build_number = int(os.environ['BUILD_NUMBER'])
     build_commit = os.environ['BUILD_COMMIT']
@@ -49,6 +64,7 @@ def test_integration_accurracy(record_property):
     window_size = float(os.environ.get('WINDOW_SIZE', 10.0))
     min_recall = float(os.environ.get('MIN_RECALL', -1))
     min_precision = float(os.environ.get('MIN_PRECISION', -1))
+    crt_path = os.environ.get('CERT_PATH')
 
     logging.info('window size = %s', window_size)
     logging.info('build number = %r', build_number)
@@ -56,7 +72,7 @@ def test_integration_accurracy(record_property):
     logging.info('min precision = %r', min_precision)
 
     # Check running tasks.
-    tasks = _get_mesos_running_tasks(mesos_master_host)
+    tasks = _get_kubernetes_running_tasks(kubernetes_host, crt_path)
     logging.info('tasks = %s', len(tasks))
     assert len(tasks) >= mesos_expected_tasks, \
         'invalid number of tasks: %r (expected=%r)' % (len(tasks), mesos_expected_tasks)

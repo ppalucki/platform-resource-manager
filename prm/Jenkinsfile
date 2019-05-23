@@ -13,7 +13,7 @@ pipeline {
         BASELINE_SLEEP = 40
         CONTENDER_SLEEP = 40
         BUILD_COMMIT = "${GIT_COMMIT}"
-        CERT_PATH = "/etc/kubernetes/ssl/"
+        CRT_PATH = "/etc/kubernetes/ssl/"
 	EXTRA_ANSIBLE_PARAMS = ""
     }
     options {
