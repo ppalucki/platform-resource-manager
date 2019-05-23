@@ -42,8 +42,8 @@ def _get_mesos_running_tasks(mesos_master_host):
 def test_integration_accurracy(record_property):
     """ Integration tests to check number of runnings tasks during scenario
     and calculate and output them to csv file for visulization. """
-    assert 'MESOS_MASTER_HOST' in os.environ, 'required to get number of running tasks'
-    assert 'MESOS_EXPECTED_TASKS' in os.environ, 'required to check number of tasks running'
+    assert 'KUBERNETES_MASTER_HOST' in os.environ, 'required to get number of running tasks'
+    assert 'KUBERNETES_EXPECTED_TASKS' in os.environ, 'required to check number of tasks running'
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
     assert 'BUILD_NUMBER' in os.environ
     assert 'BUILD_COMMIT' in os.environ
