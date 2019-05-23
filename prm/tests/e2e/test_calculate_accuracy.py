@@ -25,24 +25,10 @@ from prm.accuracy import (build_prometheus_url, fetch_metrics,
 import requests
 
 
-def _get_mesos_running_tasks(mesos_master_host):
-    tasks_response = requests.post(
-        'http://%s:5050/api/v1' % mesos_master_host,
-        data='{"type": "GET_TASKS"}',
-        headers={'content-type': 'application/json'}
-    )
-    tasks_response.raise_for_status()
-    tasks = tasks_response.json()
-    if 'tasks' not in tasks['get_tasks']:
-        return []
-    else:
-        return sorted([t['name'] for t in tasks['get_tasks']['tasks']])
-
-
 def test_integration_accurracy(record_property):
     """ Integration tests to check number of runnings tasks during scenario
     and calculate and output them to csv file for visulization. """
-    assert 'KUBERNETES_MASTER_HOST' in os.environ, 'required to get number of running tasks'
+    assert 'KUBERNETES_HOST' in os.environ, 'required to get number of running tasks'
     assert 'KUBERNETES_EXPECTED_TASKS' in os.environ, 'required to check number of tasks running'
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
     assert 'BUILD_NUMBER' in os.environ
@@ -51,7 +37,7 @@ def test_integration_accurracy(record_property):
     assert 'MIN_RECALL' in os.environ
     assert 'MIN_PRECISION' in os.environ
 
-    mesos_master_host = os.environ['MESOS_MASTER_HOST']
+    mesos_master_host = os.environ['KUBERNETES_MASTER_HOST']
     prometheus = os.environ['PROMETHEUS']
     build_number = int(os.environ['BUILD_NUMBER'])
     build_commit = os.environ['BUILD_COMMIT']
@@ -59,7 +45,7 @@ def test_integration_accurracy(record_property):
     tags = dict(build_number=build_number,
                 build_scenario=build_scenario,
                 build_commit=build_commit)
-    mesos_expected_tasks = int(os.environ['MESOS_EXPECTED_TASKS'])
+    mesos_expected_tasks = int(os.environ['KUBERNETES_EXPECTED_TASKS'])
     window_size = float(os.environ.get('WINDOW_SIZE', 10.0))
     min_recall = float(os.environ.get('MIN_RECALL', -1))
     min_precision = float(os.environ.get('MIN_PRECISION', -1))

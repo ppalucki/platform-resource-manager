@@ -9,7 +9,7 @@ pipeline {
         LLC_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
         MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090'
-        KUBERNETES_MASTER_HOST='100.64.176.33'
+        KUBERNETES_HOST='100.64.176.34'
         BASELINE_SLEEP = 40
         CONTENDER_SLEEP = 40
         BUILD_COMMIT = "${GIT_COMMIT}"
@@ -131,7 +131,7 @@ pipeline {
                 expression { return params.MB }
             }
             environment {
-                MESOS_EXPECTED_TASKS = -1
+                KUBERNETES_EXPECTED_TASKS = -1
                 MIN_RECALL = -1
                 MIN_PRECISION = -1
                 BUILD_SCENARIO = "mbw"
