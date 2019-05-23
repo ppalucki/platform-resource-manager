@@ -2,8 +2,8 @@ runner: !DetectionRunner
   rdt_enabled: True
   node: !KubernetesNode
     kubelet_endpoint: "https://100.64.176.34:10250"
-    client_private_key: "CERT_PATH/apiserver-kubelet-client.key"
-    client_cert: "CERT_PATH/apiserver-kubelet-client.crt"
+    client_private_key: "CRT_PATH/apiserver-kubelet-client.key"
+    client_cert: "CRT_PATH/apiserver-kubelet-client.crt"
   action_delay: 10.
   metrics_storage: !KafkaStorage
     brokers_ips: ['100.64.176.12:9092']
