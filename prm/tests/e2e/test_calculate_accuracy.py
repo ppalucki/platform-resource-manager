@@ -28,11 +28,11 @@ import requests
 def _get_kubernetes_running_tasks(kubernetes_host, crt_path):
     crt = os.path.join(crt_path, 'apiserver-kubelet-client.crt')
     key = os.path.join(crt_path, 'apiserver-kubelet-client.key')
-    tasks_response = requests.post(
+    tasks_response = requests.get(
         'http://%s:10250/pods' % kubernetes_host,
-        data='{"type": "GET_TASKS"}',
-        headers={'content-type': 'application/json'},
-        crt=(crt, key)
+        json=dict(type='GET_STATE'),
+        verify=False,
+        cert=(crt, key)
     )
     tasks_response.raise_for_status()
     return tasks_response.json()
