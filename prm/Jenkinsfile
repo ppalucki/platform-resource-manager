@@ -60,7 +60,7 @@ pipeline {
                                 fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
                                 fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
                                 fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0),
-                                fileContentReplaceItemConfig( search: 'CERT_PATH', replace: "${CERT_PATH}", matchCount: 0)
+                                fileContentReplaceItemConfig( search: 'CRT_PATH', replace: "${CRT_PATH}", matchCount: 0)
                             ],
                             fileEncoding: 'UTF-8', 
                             filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")
@@ -142,7 +142,7 @@ pipeline {
                                 fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
                                 fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
                                 fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0),
-                                fileContentReplaceItemConfig( search: 'CERT_PATH', replace: "${CERT_PATH}", matchCount: 0)
+                                fileContentReplaceItemConfig( search: 'CRT_PATH', replace: "${CRT_PATH}", matchCount: 0)
                             ],
                             fileEncoding: 'UTF-8', 
                             filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")

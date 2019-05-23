@@ -63,7 +63,7 @@ def test_integration_accurracy(record_property):
     window_size = float(os.environ.get('WINDOW_SIZE', 10.0))
     min_recall = float(os.environ.get('MIN_RECALL', -1))
     min_precision = float(os.environ.get('MIN_PRECISION', -1))
-    crt_path = os.environ.get('CERT_PATH')
+    crt_path = os.environ.get('CRT_PATH')
 
     logging.info('window size = %s', window_size)
     logging.info('build number = %r', build_number)
