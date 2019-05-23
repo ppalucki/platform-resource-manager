@@ -41,15 +41,6 @@ pipeline {
                 }
             }
         }
-        stage("Prepare aurora cluster") {
-            when { expression { return params.MB | params.LLC} }
-            steps {
-                sh'''
-                mkdir -p ${HOME}/.aurora
-                cp ${WORKSPACE}/prm/demo_scenarios/common/aurora-clusters.json  ${HOME}/.aurora/clusters.json
-                '''
-            }
-        }
         stage("Run LLC experiment") {
             when { expression { return params.LLC } }
             environment {
