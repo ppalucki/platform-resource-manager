@@ -38,7 +38,6 @@ def _get_kubernetes_running_tasks(kubernetes_host, crt_path):
     return tasks_response.json()
 
 
-
 def test_integration_accurracy(record_property):
     """ Integration tests to check number of runnings tasks during scenario
     and calculate and output them to csv file for visulization. """
