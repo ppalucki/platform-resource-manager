@@ -27,11 +27,12 @@ import requests
 
 
 def _get_kubernetes_running_tasks(kubernetes_host, crt_path):
+    kubelet_endpoint = 'https://{}:10250'.format(kubernetes_host)
     PODS_PATH = '/pods'
     client_cert = os.path.join(crt_path, 'apiserver-kubelet-client.crt')
     client_private_key = (crt_path, 'apiserver-kubelet-client.key')
 
-    full_url = urljoin(kubernetes_host, PODS_PATH)
+    full_url = urljoin(kubelet_endpoint, PODS_PATH)
     r = requests.get(full_url, json=dict(type='GET_STATE'),
                      verify=False, cert=(client_cert, client_private_key))
     r.raise_for_status()
