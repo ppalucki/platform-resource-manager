@@ -32,7 +32,8 @@ def _get_kubernetes_running_tasks(kubernetes_host, crt_path):
     client_private_key = (crt_path, 'apiserver-kubelet-client.key')
 
     full_url = urljoin(kubernetes_host, PODS_PATH)
-    r = requests.get(full_url, json=dict(type='GET_STATE'), verify=False, cert=(client_cert, client_private_key))
+    r = requests.get(full_url, json=dict(type='GET_STATE'),
+                     verify=False, cert=(client_cert, client_private_key))
     r.raise_for_status()
     return r.json()
 
