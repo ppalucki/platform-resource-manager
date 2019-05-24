@@ -36,7 +36,7 @@ pipeline {
                     steps {
                         dir('prm') {
                             sh('make venv')
-                            // sh('make check')
+                            sh('make check')
                             sh('make package')
                         }
                     }
