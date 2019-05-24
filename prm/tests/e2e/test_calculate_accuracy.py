@@ -21,21 +21,20 @@ import logging
 
 from prm.accuracy import (build_prometheus_url, fetch_metrics,
                           calculate_components, calculate_precision_and_recall)
+from urllib.parse import urljoin
 
 import requests
 
 
 def _get_kubernetes_running_tasks(kubernetes_host, crt_path):
-    crt = os.path.join(crt_path, 'apiserver-kubelet-client.crt')
-    key = os.path.join(crt_path, 'apiserver-kubelet-client.key')
-    tasks_response = requests.get(
-        'http://%s:10250/pods' % kubernetes_host,
-        json=dict(type='GET_STATE'),
-        verify=False,
-        cert=(crt, key)
-    )
-    tasks_response.raise_for_status()
-    return tasks_response.json()
+    PODS_PATH = '/pods'
+    client_cert = os.path.join(crt_path, 'apiserver-kubelet-client.crt')
+    client_private_key = (crt_path, 'apiserver-kubelet-client.key')
+
+    full_url = urljoin(kubernetes_host, PODS_PATH)
+    r = requests.get(full_url, json=dict(type='GET_STATE'), verify=False, cert=(client_cert, client_private_key))
+    r.raise_for_status()
+    return r.json()
 
 
 def test_integration_accurracy(record_property):
@@ -59,7 +58,7 @@ def test_integration_accurracy(record_property):
     tags = dict(build_number=build_number,
                 build_scenario=build_scenario,
                 build_commit=build_commit)
-    mesos_expected_tasks = int(os.environ['KUBERNETES_EXPECTED_TASKS'])
+    kubernetes_expected_tasks = int(os.environ['KUBERNETES_EXPECTED_TASKS'])
     window_size = float(os.environ.get('WINDOW_SIZE', 10.0))
     min_recall = float(os.environ.get('MIN_RECALL', -1))
     min_precision = float(os.environ.get('MIN_PRECISION', -1))
@@ -73,8 +72,8 @@ def test_integration_accurracy(record_property):
     # Check running tasks.
     tasks = _get_kubernetes_running_tasks(kubernetes_host, crt_path)
     logging.info('tasks = %s', len(tasks))
-    assert len(tasks) >= mesos_expected_tasks, \
-        'invalid number of tasks: %r (expected=%r)' % (len(tasks), mesos_expected_tasks)
+    assert len(tasks) >= kubernetes_expected_tasks, \
+        'invalid number of tasks: %r (expected=%r)' % (len(tasks), kubernetes_expected_tasks)
 
     # Calculate results.
     prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly', tags)
