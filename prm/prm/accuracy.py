@@ -69,7 +69,8 @@ def calculate_components(anomalies, prometheus, tags, violation_window_size):
     slo_violations_metrics = fetch_metrics(slo_violations_url)
     slo_violations = 0
     for metric in slo_violations_metrics['data']['result']:
-        slo_violations += len(metric['values'])
+        if metric.get('values'):
+            slo_violations += len(metric['values'])
 
     true_positives = 0
     anomalies_found = 0
