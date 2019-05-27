@@ -23,6 +23,7 @@ from prm.accuracy import (build_prometheus_url, fetch_metrics,
                           calculate_components, calculate_precision_and_recall)
 
 import requests
+from time import time
 
 
 def _get_mesos_running_tasks(mesos_master_host):
@@ -76,7 +77,8 @@ def test_integration_accurracy(record_property):
         'invalid number of tasks: %r (expected=%r)' % (len(tasks), mesos_expected_tasks)
 
     # Calculate results.
-    prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly', tags)
+    prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly',
+                                                      tags, 3600, time())
     logging.debug('prometheus query = %r', prometheus_anomalies_query)
     anomalies = fetch_metrics(prometheus_anomalies_query)
     logging.info('found anomalies = %s', len(anomalies['data']['result']))
