@@ -16,6 +16,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from requests import get
+from time import time
 
 _PROMETHEUS_QUERY_PATH = "/api/v1/query"
 _PROMETHEUS_QUERY_RANGE_PATH = "/api/v1/query_range"
@@ -63,7 +64,8 @@ def fetch_metrics(url):
 
 
 def calculate_components(anomalies, prometheus, tags, violation_window_size):
-    slo_violations_url = build_prometheus_url(prometheus, 'sli>slo', tags)
+    slo_violations_url = build_prometheus_url(prometheus, 'sli>slo', tags,
+                                              3600, time())
     slo_violations_metrics = fetch_metrics(slo_violations_url)
     slo_violations = 0
     for metric in slo_violations_metrics['data']['result']:
