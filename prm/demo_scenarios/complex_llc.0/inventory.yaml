@@ -9,7 +9,7 @@ application_hosts:
     workloads:
       twemcache_mutilate:
         small:
-          count: 0
+          count: 8
           slo: 500
           communication_port: 11211
           twemcache:
