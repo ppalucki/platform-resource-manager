@@ -56,7 +56,6 @@ def build_prometheus_url(prometheus, name, tags=None, window_size=None, event_ti
     return url
 
 
-
 def fetch_metrics(url):
     response = get(url)
     response.raise_for_status()
