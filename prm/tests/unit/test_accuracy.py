@@ -72,7 +72,8 @@ def test_calculate_precision_and_recall(true_positives, anomaly_count, slo_viola
         (
             _dict_from_json('accuracy/anomalies.json'),
             {
-                'irrelevant/api/v1/query?query=sli>slo{build_number="1"}':
+                'irrelevant/api/v1/query_range?query=sli>slo{build_number="1"}'
+                '&start=1558960265.3748605&end=1558963865.3748605&step=1s':
                     _dict_from_json('accuracy/slo_violations.json'),
                 'irrelevant/api/v1/query_range?query=sli>slo{build_number="1",workload_instance='
                 '"cassandra_stress--default--14--9142"}&start=1552484536.644&end=1552484546.644&'
@@ -88,7 +89,8 @@ def test_calculate_precision_and_recall(true_positives, anomaly_count, slo_viola
         (
             _dict_from_json('accuracy/anomalies.json'),
             {
-                'irrelevant/api/v1/query?query=sli>slo{build_number="1"}':
+                'irrelevant/api/v1/query_range?query=sli>slo{build_number="1"}'
+                '&start=1558960265.3748605&end=1558963865.3748605&step=1s':
                     _dict_from_json('accuracy/slo_violations.json'),
                 'irrelevant/api/v1/query_range?query=sli>slo{build_number="1",workload_instance='
                 '"cassandra_stress--default--14--9142"}&start=1552484536.644&end=1552484546.644&'
@@ -104,7 +106,8 @@ def test_calculate_precision_and_recall(true_positives, anomaly_count, slo_viola
         (
             _dict_from_json('accuracy/anomalies.json'),
             {
-                'irrelevant/api/v1/query?query=sli>slo{build_number="1"}':
+                'irrelevant/api/v1/query_range?query=sli>slo{build_number="1"}'
+                '&start=1558960265.3748605&end=1558963865.3748605&step=1s':
                     _dict_from_json('accuracy/slo_violations.json'),
                 'irrelevant/api/v1/query_range?query=sli>slo{build_number="1",workload_instance='
                 '"cassandra_stress--default--14--9142"}&start=1552484536.644&end=1552484546.644&'
@@ -120,12 +123,15 @@ def test_calculate_precision_and_recall(true_positives, anomaly_count, slo_viola
         (
                 _dict_from_json('accuracy/empty_results.json'),
                 {
-                    'irrelevant/api/v1/query?query=sli>slo{build_number="1"}':
+                    'irrelevant/api/v1/query_range?query=sli>slo{build_number="1"}'
+                    '&start=1558960265.3748605&end=1558963865.3748605&step=1s':
                         _dict_from_json('accuracy/slo_violations.json')
                 }, 0, 0, 6),
     ])
-def test_calculate_components(anomalies, requests, expected_true_positives,
+@patch('prm.accuracy.time', return_value=1558962065.3748605)
+def test_calculate_components(time, anomalies, requests, expected_true_positives,
                               expected_anomalies_found, expected_real_positives):
+    print(requests)
     with patch('prm.accuracy.get',
                Mock(side_effect=lambda url: Mock(Response, json=Mock(return_value=requests[url])))):
         true_positives, anomalies_found, real_positives = calculate_components(

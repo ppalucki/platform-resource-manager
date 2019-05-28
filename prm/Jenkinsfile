@@ -79,10 +79,10 @@ pipeline {
                 dir('prm/workload-collocation-agent/workloads'){
                     echo 'Start baseline workloads.'
                     sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep BASELINE_SLEEP
+                    sleep LLC_BASELINE_SLEEP
                     echo 'Start contender workload.'
                     sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep CONTENDER_SLEEP
+                    sleep LLC_CONTENDER_SLEEP
                 }
                 dir('prm'){
                     echo 'Calculate precision and recall...'
@@ -164,7 +164,7 @@ pipeline {
                     sleep BASELINE_SLEEP
                     echo 'Start contender workload.'
                     sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep CONTENDER_SLEEP
+                    sleep MBW_CONTENDER_SLEEP
                 }
                 dir('prm'){
                     echo 'Calculate precision and recall...'

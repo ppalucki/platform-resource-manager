@@ -1,7 +1,7 @@
 # Intel® PRM plugin
 
 This readme describes the Intel® Platform Resource Manager (Intel® PRM) plugin
-for the Orchestration-aware Workload Collocation Agent (WCA).
+for the Workload Collocation Agent (WCA).
 
 ## Description
 

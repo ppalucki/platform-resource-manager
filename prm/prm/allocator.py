@@ -284,7 +284,7 @@ class ResourceAllocator(Allocator):
         return assigned_cpus
 
     def _process_measurements(self, tasks_measurements: TasksMeasurements,
-                              tasks_labels: TasksLabels, metric_list: List[WcaMetric],
+                              tasks_labels: TasksLabels, metric_list: List[WCAMetric],
                               timestamp: float, assigned_cpus: float):
 
         sysutil = 0
@@ -305,7 +305,7 @@ class ResourceAllocator(Allocator):
                         if self.mbc_enabled:
                             self.mbc.budgeting([cid], [])
                     else:
-                        self.cpuc.set_share(cid, 1000)
+                        self.cpuc.set_share(cid, 1.0)
                         if self.exclusive_cat:
                             self.l3c.budgeting([], [cid])
 

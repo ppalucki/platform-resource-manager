@@ -270,7 +270,8 @@ class ContentionDetector(detectors.AnomalyDetector):
         return assigned_cpus
 
     def _process_measurements(self, tasks_measurements: TasksMeasurements,
-                              tasks_labels: TasksLabels, metric_list: List[WcaMetric],
+                              tasks_labels: TasksLabels,
+                              metric_list: List[WcaMetric],
                               timestamp: float, assigned_cpus: float):
 
         sysutil = 0

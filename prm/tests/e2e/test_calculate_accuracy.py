@@ -24,6 +24,7 @@ from prm.accuracy import (build_prometheus_url, fetch_metrics,
 from urllib.parse import urljoin
 
 import requests
+from time import time
 
 
 def _get_kubernetes_running_tasks(kubernetes_host, crt_path):
@@ -78,10 +79,11 @@ def test_integration_accurracy(record_property):
         'invalid number of tasks: %r (expected=%r)' % (len(tasks), kubernetes_expected_tasks)
 
     # Calculate results.
-    prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly', tags)
+    prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly',
+                                                      tags, 3600, time())
     logging.debug('prometheus query = %r', prometheus_anomalies_query)
     anomalies = fetch_metrics(prometheus_anomalies_query)
-    logging.info('found anomalies = %s', len(anomalies))
+    logging.info('found anomalies = %s', len(anomalies['data']['result']))
 
     true_positives, anomaly_count, slo_violations = calculate_components(
         anomalies, prometheus, tags, window_size)
@@ -100,11 +102,8 @@ def test_integration_accurracy(record_property):
     logging.info('recall = %s', recall)
     logging.info('precision = %s', precision)
 
-    if not os.path.exists('test_results.csv'):
-        with open('test_results.csv', 'w') as f:
-            f.write('recall,precision,tasks,anomaly_count,slo_violations\n')
-
-    with open('test_results.csv', 'a') as f:
+    with open('test_results.csv', 'w') as f:
+        f.write('recall,precision,tasks,anomaly_count,slo_violations\n')
         f.write('%s,%s,%s,%s,%s\n' % (
             recall, precision, len(tasks), anomaly_count, slo_violations))
 
