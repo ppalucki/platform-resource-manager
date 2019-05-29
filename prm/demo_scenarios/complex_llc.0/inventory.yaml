@@ -9,7 +9,7 @@ application_hosts:
     workloads:
       twemcache_mutilate:
         small:
-          count: 8
+          count: 10
           slo: 500
           communication_port: 11211
           twemcache:
@@ -33,7 +33,7 @@ application_hosts:
               disk: 20
         big:
           # twice as much cores assigned, and 4 times more threads
-          count: 1
+          count: 0
           slo: 5000
           communication_port: 11213
           twemcache:
@@ -78,7 +78,7 @@ application_hosts:
       cassandra_stress:
         default:
           labels: {'type': 'best_efforts'}
-          count: 1
+          count: 0
           communication_port: 9142
           jmx_port: 7299
           storage_port: 7100
