@@ -74,7 +74,7 @@ def calculate_components(anomalies, prometheus, tags, violation_window_size):
     true_positives = 0
     anomalies_found = 0
     for metric in anomalies['data']['result']:
-        workload_instance = metric['metric']['workload_instance']
+        workload_instance = metric['metric'].get('workload_instance')
         for anomaly in metric['values']:
             anomalies_found += 1
             anomaly_slo_violations_url = \
