@@ -18,8 +18,8 @@ application_hosts:
               max_memory: 4024
             resources:
               cpu: 2
-              ram: 50
-              disk: 50
+              ram: 20
+              disk: 20
           mutilate:
             env:
               sli_percentile: 95    # Note: 99 percentile is too sensitive
