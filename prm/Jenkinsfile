@@ -16,7 +16,7 @@ pipeline {
         MBW_BASELINE_SLEEP = 5
         MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
-        CRT_PATH = "/etc/kubernetes/ssl/"
+        CRT_PATH = "/etc/kubernetes/ssl"
 	EXTRA_ANSIBLE_PARAMS = ""
     }
     options {
@@ -137,7 +137,7 @@ pipeline {
             steps {
 
                 echo 'Reconfigure wca...'
-		        sh 'sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config_kubernetes.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
+		        sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config_kubernetes.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
