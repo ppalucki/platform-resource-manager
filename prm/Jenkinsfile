@@ -115,6 +115,8 @@ pipeline {
             steps {
                 echo 'Reconfigure wca...'
                 sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
+                sh 'sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca.service /etc/systemd/system/wca.service'
+                sh 'sudo systemctl daemon-reload'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
@@ -199,7 +201,9 @@ pipeline {
             steps {
 
                 echo 'Reconfigure wca...'
-		sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
+		        sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
+                sh 'sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca.service /etc/systemd/system/wca.service'
+                sh 'sudo systemctl daemon-reload'
                 contentReplace(
                     configs: [
                         fileContentReplaceConfig(
