@@ -13,7 +13,9 @@ runner: !DetectionRunner
     brokers_ips: ['100.64.176.12:9092']
     topic: "wca_anomalies"
     max_timeout_in_seconds: 5.
-  detector: !ExampleDetector
+  detector: !ContentionDetector
+      action_delay: 10
+      mode_config: detect
 
   extra_labels:
     env_uniq_id: "34"
