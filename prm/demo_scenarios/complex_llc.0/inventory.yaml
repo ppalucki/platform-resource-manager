@@ -29,8 +29,8 @@ application_hosts:
               qps: 20000            # that's original value (40k)
             resources:
               cpu: 2
-              ram: 10
-              disk: 20
+              ram: 5
+              disk: 10
         big:
           # twice as much cores assigned, and 4 times more threads
           count: 0
