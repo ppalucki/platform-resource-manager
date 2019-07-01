@@ -20,6 +20,7 @@ import datetime
 from typing import List, Union, Optional
 from wca.config import IpPort
 from wca.security import SSL
+import os
 import json
 import logging
 import string
