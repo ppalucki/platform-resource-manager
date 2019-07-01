@@ -17,7 +17,6 @@ pipeline {
         MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
         EXTRA_ANSIBLE_PARAMS = ""
-        ORCHESTRATOR="Mesos"
     }
     options {
         disableConcurrentBuilds()
