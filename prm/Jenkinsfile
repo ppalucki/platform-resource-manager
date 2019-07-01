@@ -202,9 +202,9 @@ pipeline {
                 reconfigure_wca()
                 start_wca()
                 echo 'Start baseline workloads.'
-                start_workloads(${MEMBW_INVENTORY}, "specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", ${LABELS}, ${MBW_BASELINE_SLEEP})
+                start_workloads("${MEMBW_INVENTORY}"", "specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", "${LABELS}", "${MBW_BASELINE_SLEEP}")
                 echo 'Start contender workload.'
-                start_workloads(${MEMBW_INVENTORY}, "tensorflow_benchmark_prediction", ${LABELS}, ${MBW_CONTENDER_SLEEP})
+                start_workloads("${MEMBW_INVENTORY}", "tensorflow_benchmark_prediction", "${LABELS}", "${MBW_CONTENDER_SLEEP}"")
                 calculate_precision()
             }
             post {
