@@ -157,7 +157,6 @@ pipeline {
             }
         }
     }
-}
 
 def plot_results(scenario, csv_file) {
     echo 'Plot ${scenario} results...'
