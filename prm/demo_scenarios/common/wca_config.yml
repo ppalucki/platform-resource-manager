@@ -12,7 +12,7 @@ runner: !DetectionRunner
     topic: "wca_anomalies"
     max_timeout_in_seconds: 5.
   detector: !ContentionDetector
-    action_delay: 10
+    action_delay: 10.
     mode_config: detect
     
   extra_labels:

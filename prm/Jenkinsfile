@@ -61,41 +61,14 @@ pipeline {
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
             steps {
-                echo 'Reconfigure wca...'
-                sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.collect.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
-                contentReplace(
-                    configs: [
-                        fileContentReplaceConfig(
-                            configs: [
-                                fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
-                                fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
-                                fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)
-                            ],
-                            fileEncoding: 'UTF-8', 
-                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")
-                        ])
-                sh'''
-                sudo mkdir -p /var/lib/wca
-                sudo mkdir -p /etc/wca
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/wca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
-                sudo cp ${WORKSPACE}/prm/dist/wca-prm.pex /usr/bin/wca.pex
-                sudo systemctl restart wca
-                '''
-                echo 'Restart wca...'
-                sleep 5
-                sh 'sudo systemctl status wca'
-
-                dir('prm/workload-collocation-agent/workloads'){
-                    echo 'Start baseline workloads.'
-                    sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep LLC_COLLECT_SLEEP
-                }
+                reconfigure_wca()
+                start_wca()
+                echo 'Start baseline workloads.'
+                start_workloads("${LLC_INVENTORY}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LABELS}", "${LLC_COLLECT_SLEEP}")
             }
             post {
                 always {
-                    echo 'Stop all workloads...'
-                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    stop_workloads()
                     echo 'Stop wca...'
                     sh 'sudo systemctl stop wca'
                 }
@@ -283,4 +256,14 @@ def calculate_precision() {
         echo 'Calculate precision and recall...'
         sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug --log-cli-level=debug -v"
     }
+}
+
+def stop_workloads() {
+    echo 'Stop all workloads...'
+    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+}
+
+def stop_wca() {
+    echo 'Stop wca...'
+    sh 'sudo systemctl stop wca'
 }
