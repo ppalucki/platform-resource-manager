@@ -2,7 +2,7 @@
 Description=wca
 
 [Service]
-ExecStart=/usr/bin/wca.pex --config /etc/wca/wca_config.yml -l debug -r prm.detector:ContentionDetector -r prm.model_distribution.db.ModelDatabase --root
+ExecStart=/usr/bin/wca.pex --config /etc/wca/wca_config.yml -l debug -r prm.detector:ContentionDetector -r prm.model_distribution.db:ModelDatabase --root
 Restart=no
 LimitNOFILE=500000
 # CAP_DAC_OVERRIDE allows to remove resctrl groups and CAP_SETUID allows to change effective uid to add tasks to the groups
