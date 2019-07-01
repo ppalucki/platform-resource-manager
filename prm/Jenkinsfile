@@ -267,6 +267,7 @@ def start_wca() {
     sudo systemctl restart wca
     sleep 5
     sh 'sudo systemctl status wca'
+    '''
 }
 
 def start_workloads(scenario_inventory, tags, labels, sleep_time) {
