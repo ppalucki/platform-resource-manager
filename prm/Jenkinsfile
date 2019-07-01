@@ -34,10 +34,7 @@ pipeline {
             stages {
                 stage("Prepare venv && build pex") {
                     steps {
-                        dir('prm') {
-                            sh('make venv')
-                            sh('make check')
-                            sh('make package')
+                        build_pex()
                         }
                     }
                 }
@@ -75,7 +72,6 @@ pipeline {
             }
         }
 
-
         stage("Run LLC experiment") {
             when { expression { return params.LLC } }
             environment {
@@ -86,48 +82,18 @@ pipeline {
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
             steps {
-                echo 'Reconfigure wca...'
-                sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
-                sh 'sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca.service /etc/systemd/system/wca.service'
-                sh 'sudo systemctl daemon-reload'
-                contentReplace(
-                    configs: [
-                        fileContentReplaceConfig(
-                            configs: [
-                                fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
-                                fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
-                                fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)
-                            ],
-                            fileEncoding: 'UTF-8', 
-                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")
-                        ])
-                sh'''
-                sudo mkdir -p /var/lib/wca/
-                sudo mkdir -p /etc/wca
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/wca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
-                sudo cp ${WORKSPACE}/prm/dist/wca-prm.pex /usr/bin/wca.pex
-                sudo systemctl restart wca
-                '''
-                echo 'Restart wca...'
-                sleep 5
-                sh 'sudo systemctl status wca'
-
+                reconfigure_wca()
+                start_wca()
                 dir('prm/workload-collocation-agent/workloads'){
                     sh 'sed -i s/number_of_rows=100000$/number_of_rows=10000/g ./cassandra_stress/cassandra_stress.aurora'
                     sh 'sed -i s/40000/2000/g ./mutilate/mutilate.aurora'
                     sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
                     echo 'Start baseline workloads.'
-                    sh 'ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep LLC_BASELINE_SLEEP
+                    start_workloads("${LLC_INVENTORY}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LABELS}", "${LLC_BASELINE_SLEEP}")
                     echo 'Start contender workload.'
-                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${LLC_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=cassandra_stress--stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep LLC_CONTENDER_SLEEP
+                    start_workloads(${LLC_INVENTORY}, "cassandra_stress--stress", "${LABELS}", "${LLC_CONTENDER_SLEEP}")
                 }
-                dir('prm'){
-                    echo 'Calculate precision and recall...'
-                    sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug --log-cli-level=debug -v"
-                }
+                calculate_precision()
             }
             post {
                 always {
@@ -182,34 +148,35 @@ pipeline {
             }
             post {
                 always {
-                    echo 'Stop all workloads...'
-                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    stop_workloads()
                     sleep 5
                     echo 'Plot LLC results...'
-                    plot(
-                        csvFileName: 'mbw_results.csv',
-                        style: 'line',
-                        csvSeries: [
-                            [
-                                displayTableFlag: false,
-                                exclusionValues: '',
-                                inclusionFlag: 'OFF',
-                                file: 'prm/test_results.csv',
-                                url: ''
-                            ]
-                        ],
-                       group: 'PRM performance v4',
-                       title: 'MBW complex scenario',
-                       numBuilds: '5',
-                    )
-                    echo 'Storing MBW results.'
-                    junit 'prm/unit_results.xml'
-                    echo 'Stop wca...'
-                    sh 'sudo systemctl stop wca'
+                    plot_results('MBW', 'mbw_results.csv')
+                    stop_wca()
                 }
             }
         }
     }
+}
+
+def plot_results(scenario, csv_file) {
+    echo 'Plot ${scenario} results...'
+    plot(csvFileName: csv_file,
+         style: 'line',
+         csvSeries: [
+            [
+                displayTableFlag: false,
+                exclusionValues: '',
+                inclusionFlag: 'OFF',
+                file: 'prm/test_results.csv',
+                url: ''
+            ]
+         ],
+         group: 'PRM performance v4',
+         title: '${scenario} complex scenario',
+         numBuilds: '5',)
+    echo 'Storing results.'
+    junit 'prm/unit_results.xml'
 }
 
 def reconfigure_wca() {
@@ -227,6 +194,8 @@ def reconfigure_wca() {
                 fileEncoding: 'UTF-8',
                 filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")])
     sh'''
+    sudo mkdir -p /var/lib/wca/
+    sudo mkdir -p /etc/wca
     sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/wca/
     sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/wca/
     sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
@@ -266,4 +235,12 @@ def stop_workloads() {
 def stop_wca() {
     echo 'Stop wca...'
     sh 'sudo systemctl stop wca'
+}
+
+def build_pex() {
+    dir('prm') {
+        sh('make venv')
+        sh('make check')
+        sh('make package')
+        }
 }
