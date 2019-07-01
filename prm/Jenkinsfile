@@ -39,7 +39,6 @@ pipeline {
                     }
                 }
             }
-        }
         stage("Prepare aurora cluster") {
             when { expression { return params.MB | params.LLC} }
             steps {
@@ -157,6 +156,7 @@ pipeline {
             }
         }
     }
+}
 
 def plot_results(scenario, csv_file) {
     echo 'Plot ${scenario} results...'
