@@ -90,7 +90,7 @@ pipeline {
                     echo 'Start baseline workloads.'
                     start_workloads("${LLC_INVENTORY}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LABELS}", "${LLC_BASELINE_SLEEP}")
                     echo 'Start contender workload.'
-                    start_workloads(${LLC_INVENTORY}, "cassandra_stress--stress", "${LABELS}", "${LLC_CONTENDER_SLEEP}")
+                    start_workloads("${LLC_INVENTORY}", "cassandra_stress--stress", "${LABELS}", "${LLC_CONTENDER_SLEEP}")
                 }
                 calculate_precision()
             }
