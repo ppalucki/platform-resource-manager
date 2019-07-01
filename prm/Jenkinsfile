@@ -199,45 +199,13 @@ pipeline {
 
 
             steps {
-
-                echo 'Reconfigure wca...'
-		        sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
-                sh 'sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca.service /etc/systemd/system/wca.service'
-                sh 'sudo systemctl daemon-reload'
-                contentReplace(
-                    configs: [
-                        fileContentReplaceConfig(
-                            configs: [
-                                fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
-                                fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
-                                fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)
-                            ],
-                            fileEncoding: 'UTF-8', 
-                            filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")
-                        ])
-                sh'''
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/wca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/wca/
-                sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
-                sudo cp ${WORKSPACE}/prm/dist/wca-prm.pex /usr/bin/wca.pex
-                sudo systemctl restart wca
-                '''
-                sleep 5
-                echo 'Restart wca...'
-                sh 'sudo systemctl status wca'
-
-                dir('prm/workload-collocation-agent/workloads'){
-                    echo 'Start baseline workloads.'
-                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}' 
-                    sleep MBW_BASELINE_SLEEP
-                    echo 'Start contender workload.'
-                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${MEMBW_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=tensorflow_benchmark_prediction -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
-                    sleep MBW_CONTENDER_SLEEP
-                }
-                dir('prm'){
-                    echo 'Calculate precision and recall...'
-                    sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug --log-cli-level=debug -v"
-                }
+                reconfigure_wca()
+                start_wca()
+                echo 'Start baseline workloads.'
+                start_workloads(${MEMBW_INVENTORY}, "specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", ${LABELS}, ${MBW_BASELINE_SLEEP})
+                echo 'Start contender workload.'
+                start_workloads(${MEMBW_INVENTORY}, "tensorflow_benchmark_prediction", ${LABELS}, ${MBW_CONTENDER_SLEEP})
+                calculate_precision()
             }
             post {
                 always {
@@ -268,5 +236,50 @@ pipeline {
                 }
             }
         }
+    }
+}
+
+def reconfigure_wca() {
+    echo 'Reconfigure wca...'
+    sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
+    sh 'sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca.service /etc/systemd/system/wca.service'
+    sh 'sudo systemctl daemon-reload'
+    contentReplace(
+        configs: [
+            fileContentReplaceConfig(
+                configs: [
+                    fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
+                    fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
+                    fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)],
+                fileEncoding: 'UTF-8',
+                filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")])
+    sh'''
+    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json /var/lib/wca/
+    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/wca/
+    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
+    sudo cp ${WORKSPACE}/prm/dist/wca-prm.pex /usr/bin/wca.pex
+    '''
+}
+
+def start_wca() {
+    '''
+    echo 'Restart wca...'
+    sudo systemctl restart wca
+    sleep 5
+    sh 'sudo systemctl status wca'
+}
+
+def start_workloads(scenario_inventory, tags, labels, sleep_time) {
+    dir('prm/workload-collocation-agent/workloads'){
+        sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${scenario_inventory} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${labels}" ${WORKSPACE}/${PLAYBOOK}'
+        sleep sleep_time
+    }
+
+}
+
+def calculate_precision() {
+    dir('prm'){
+        echo 'Calculate precision and recall...'
+        sh "PYTHONPATH=. pipenv run pytest tests/e2e/test_calculate_accuracy.py --junitxml=unit_results.xml --junit-prefix=${BUILD_SCENARIO} --log-level=debug --log-cli-level=debug -v"
     }
 }
