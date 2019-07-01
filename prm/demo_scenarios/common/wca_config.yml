@@ -15,6 +15,7 @@ runner: !DetectionRunner
     database: !ModelDatabase
       db_type: local
       host: ~
+      directory: /tmp/db
     action_delay: 10.
     
   extra_labels:
