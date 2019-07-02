@@ -139,7 +139,7 @@ def clean(scenario, csv_file) {
 
 def plot_results(scenario, csv_file) {
     echo """Plot ${scenario} results..."""
-    plot(csvFileName: csv_file,
+    plot(csvFileName: "${csv_file}",
          style: 'line',
          csvSeries: [
             [
@@ -151,7 +151,7 @@ def plot_results(scenario, csv_file) {
             ]
          ],
          group: 'PRM performance v4',
-         title: '${scenario} complex scenario',
+         title: "${scenario} complex scenario",
          numBuilds: '5',)
     echo 'Storing results.'
     junit 'prm/unit_results.xml'
