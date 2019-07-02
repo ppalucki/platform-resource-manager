@@ -60,7 +60,6 @@ pipeline {
                 start_wca()
                 echo 'Start baseline workloads.'
                 start_workloads('twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_COLLECT_SLEEP}")
-                stop_workloads()
             }
             post {
                 always {
@@ -91,7 +90,6 @@ pipeline {
                     start_workloads('twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_BASELINE_SLEEP}")
                     echo 'Start contender workload.'
                     start_workloads('cassandra_stress--stress', "${LLC_CONTENDER_SLEEP}")
-                    stop_workloads()
                 }
                 calculate_precision()
             }
@@ -126,7 +124,6 @@ pipeline {
                 echo 'Start contender workload.'
                 start_workloads('tensorflow_benchmark_prediction', "${MBW_CONTENDER_SLEEP}")
                 calculate_precision()
-                stop_workloads()
             }
             post {
                 always {
@@ -141,8 +138,8 @@ pipeline {
 }
 
 def plot_results(scenario, csv_file) {
-    echo 'Plot ${scenario} results...'
-    plot(csvFileName: csv_file,
+    echo """Plot ${scenario} results..."""
+    plot(csvFileName: "${csv_file}",
          style: 'line',
          csvSeries: [
             [
