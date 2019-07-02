@@ -59,7 +59,7 @@ pipeline {
                 reconfigure_wca()
                 start_wca()
                 echo 'Start baseline workloads.'
-                start_workloads('twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_COLLECT_SLEEP}")
+                start_workloads("twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_COLLECT_SLEEP}")
                 calculate_precision()
             }
             post {
@@ -87,9 +87,9 @@ pipeline {
                     sh 'sed -i s/40000/2000/g ./mutilate/mutilate.aurora'
                     sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
                     echo 'Start baseline workloads.'
-                    start_workloads('twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_BASELINE_SLEEP}")
+                    start_workloads("twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
                     echo 'Start contender workload.'
-                    start_workloads('cassandra_stress--stress', "${LLC_CONTENDER_SLEEP}")
+                    start_workloads("cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
                 }
                 calculate_precision()
             }
@@ -117,9 +117,9 @@ pipeline {
                 reconfigure_wca()
                 start_wca()
                 echo 'Start baseline workloads.'
-                start_workloads('specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress', "${MBW_BASELINE_SLEEP}")
+                start_workloads("specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", "${MBW_BASELINE_SLEEP}")
                 echo 'Start contender workload.'
-                start_workloads('tensorflow_benchmark_prediction', "${MBW_CONTENDER_SLEEP}")
+                start_workloads("tensorflow_benchmark_prediction", "${MBW_CONTENDER_SLEEP}")
                 calculate_precision()
             }
             post {
