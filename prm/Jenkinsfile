@@ -54,13 +54,14 @@ pipeline {
             environment {
                 MESOS_EXPECTED_TASKS = -1
                 BUILD_SCENARIO = "llc"
+                SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
             }
             steps {
                 reconfigure_wca()
                 start_wca()
                 echo 'Start baseline workloads.'
-                start_workloads("${LLC_INVENTORY}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LABELS}", "${LLC_COLLECT_SLEEP}")
+                start_workloads("twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_COLLECT_SLEEP}")
             }
             post {
                 always {
@@ -88,9 +89,9 @@ pipeline {
                     sh 'sed -i s/40000/2000/g ./mutilate/mutilate.aurora'
                     sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
                     echo 'Start baseline workloads.'
-                    start_workloads("${LLC_INVENTORY}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LABELS}", "${LLC_BASELINE_SLEEP}")
+                    start_workloads("twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
                     echo 'Start contender workload.'
-                    start_workloads("${LLC_INVENTORY}", "cassandra_stress--stress", "${LABELS}", "${LLC_CONTENDER_SLEEP}")
+                    start_workloads("cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
                 }
                 calculate_precision()
             }
@@ -133,6 +134,7 @@ pipeline {
                 MIN_PRECISION = -1
                 BUILD_SCENARIO = "mbw"
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
+                SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
             }
 
 
@@ -140,9 +142,9 @@ pipeline {
                 reconfigure_wca()
                 start_wca()
                 echo 'Start baseline workloads.'
-                start_workloads("${MEMBW_INVENTORY}", "specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", "${LABELS}", "${MBW_BASELINE_SLEEP}")
+                start_workloads("specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", "${MBW_BASELINE_SLEEP}")
                 echo 'Start contender workload.'
-                start_workloads("${MEMBW_INVENTORY}", "tensorflow_benchmark_prediction", "${LABELS}", "${MBW_CONTENDER_SLEEP}")
+                start_workloads("tensorflow_benchmark_prediction", "${MBW_CONTENDER_SLEEP}")
                 calculate_precision()
             }
             post {
@@ -210,9 +212,9 @@ def start_wca() {
     '''
 }
 
-def start_workloads(String scenario_inventory, String tags, String labels, sleep_time) {
+def start_workloads(tags, sleep_time) {
     dir('prm/workload-collocation-agent/workloads'){
-        sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${scenario_inventory} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${labels}" ${WORKSPACE}/${PLAYBOOK}'
+        sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${SCENARIO_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
         sleep sleep_time
     }
 
