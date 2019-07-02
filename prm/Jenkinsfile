@@ -63,8 +63,7 @@ pipeline {
             }
             post {
                 always {
-                    stop_workloads()
-                    stop_wca()
+                    clean("LLC", "llc_results.csv")
                 }
             }
         }
@@ -95,10 +94,7 @@ pipeline {
             }
             post {
                 always {
-                    stop_workloads()
-                    sleep 5
-                    plot_results("LLC", "llc_results.csv")
-                    stop_wca()
+                    clean("LLC", "llc_results.csv")
                 }
             }
         }
@@ -127,19 +123,23 @@ pipeline {
             }
             post {
                 always {
-                    stop_workloads()
-                    sleep 5
-                    plot_results('MBW', 'mbw_results.csv')
-                    stop_wca()
+                   clean("MBW", "mbw_results.csv")
                 }
             }
         }
     }
 }
 
+def clean(scenario, csv_file) {
+    stop_workloads()
+    sleep 5
+    plot_results(scenario, csv_file)
+    stop_wca()
+}
+
 def plot_results(scenario, csv_file) {
     echo """Plot ${scenario} results..."""
-    plot(csvFileName: "${csv_file}",
+    plot(csvFileName: """${csv_file}""",
          style: 'line',
          csvSeries: [
             [
