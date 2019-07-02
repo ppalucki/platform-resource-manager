@@ -80,6 +80,7 @@ pipeline {
                 MIN_PRECISION = -1
                 BUILD_SCENARIO = "llc"
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
+                SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
             }
             steps {
                 reconfigure_wca()
@@ -97,30 +98,10 @@ pipeline {
             }
             post {
                 always {
-                    echo 'Stop all workloads...'
-                    sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+                    stop_workloads()
                     sleep 5
-                    echo 'Plot LLC results...'
-                    plot(
-                        csvFileName: 'llc_results.csv',
-                        style: 'line',
-                        csvSeries: [
-                            [
-                                displayTableFlag: false,
-                                exclusionValues: '',
-                                inclusionFlag: 'OFF',
-                                file: 'prm/test_results.csv',
-                                url: ''
-                            ]
-                        ],
-                       group: 'PRM performance v4',
-                       title: 'LLC complex scenario',
-                       numBuilds: '5',
-                    )
-                    echo 'Storing LLC results.'
-                    junit 'prm/unit_results.xml'
-                    echo 'Stop wca...'
-                    sh 'sudo systemctl stop wca'
+                    plot_results("LLC", "llc_results.csv")
+                    stop_wca()
                 }
             }
         }
