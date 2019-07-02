@@ -139,7 +139,7 @@ def clean(scenario, csv_file) {
 
 def plot_results(scenario, csv_file) {
     echo """Plot ${scenario} results..."""
-    plot(csvFileName: """${csv_file}""",
+    plot(csvFileName: csv_file,
          style: 'line',
          csvSeries: [
             [
