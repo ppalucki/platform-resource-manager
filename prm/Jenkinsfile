@@ -66,8 +66,7 @@ pipeline {
             post {
                 always {
                     stop_workloads()
-                    echo 'Stop wca...'
-                    sh 'sudo systemctl stop wca'
+                    stop_wca()
                 }
             }
         }
@@ -93,6 +92,7 @@ pipeline {
                     start_workloads("twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
                     echo 'Start contender workload.'
                     start_workloads("cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
+                    stop_workloads()
                 }
                 calculate_precision()
             }
