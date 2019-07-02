@@ -6,8 +6,6 @@ pipeline {
     environment {
         PLAYBOOK='prm/workload-collocation-agent/workloads/run_workloads.yaml'
         INVENTORY='prm/demo_scenarios/common/inventory.yaml'
-        LLC_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-        MEMBW_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS_MASTER_HOST='100.64.176.23'
         LLC_BASELINE_SLEEP = 180 
@@ -62,6 +60,7 @@ pipeline {
                 start_wca()
                 echo 'Start baseline workloads.'
                 start_workloads("twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_COLLECT_SLEEP}")
+                stop_workloads()
             }
             post {
                 always {
@@ -127,6 +126,7 @@ pipeline {
                 echo 'Start contender workload.'
                 start_workloads("tensorflow_benchmark_prediction", "${MBW_CONTENDER_SLEEP}")
                 calculate_precision()
+                stop_workloads()
             }
             post {
                 always {
