@@ -193,7 +193,7 @@ def start_wca() {
 
 def start_workloads(tags, sleep_time) {
     dir('prm/workload-collocation-agent/workloads'){
-        sh """ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${SCENARIO_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=${tags} -e '${LABELS}' ${WORKSPACE}/${PLAYBOOK}"""
+        sh """ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${SCENARIO_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=${tags} -e \"${LABELS}\" ${WORKSPACE}/${PLAYBOOK}"""
         sleep sleep_time
     }
 
