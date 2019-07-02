@@ -149,7 +149,6 @@ pipeline {
                 always {
                     stop_workloads()
                     sleep 5
-                    echo 'Plot LLC results...'
                     plot_results('MBW', 'mbw_results.csv')
                     stop_wca()
                 }
@@ -211,7 +210,7 @@ def start_wca() {
     '''
 }
 
-def start_workloads(scenario_inventory, tags, labels, sleep_time) {
+def start_workloads(String scenario_inventory, String tags, String labels, sleep_time) {
     dir('prm/workload-collocation-agent/workloads'){
         sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${scenario_inventory} -i ${WORKSPACE}/${INVENTORY} --tags=specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress -e "${labels}" ${WORKSPACE}/${PLAYBOOK}'
         sleep sleep_time
