@@ -86,11 +86,11 @@ pipeline {
                     sh 'sed -i s/number_of_rows=100000$/number_of_rows=10000/g ./cassandra_stress/cassandra_stress.aurora'
                     sh 'sed -i s/40000/2000/g ./mutilate/mutilate.aurora'
                     sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
-                    echo 'Start baseline workloads.'
-                    start_workloads("twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
-                    echo 'Start contender workload.'
-                    start_workloads("cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
                 }
+                echo 'Start baseline workloads.'
+				start_workloads("twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
+				echo 'Start contender workload.'
+				start_workloads("cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
                 calculate_precision()
             }
             post {
