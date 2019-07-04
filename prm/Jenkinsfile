@@ -149,69 +149,53 @@ pipeline {
         }
 
 
-
-
-        stage("Run Memory Bandwidth experiment | Mesos") {
-            when {
-                expression { return params.MB }
-            }
-            agent {label 'mesos'}
-            environment {
-                MESOS_MASTER_HOST = "${MESOS}"
-                MESOS_EXPECTED_TASKS = -1
-                INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
-                MIN_RECALL = -1
-                MIN_PRECISION = -1
-                BUILD_SCENARIO = "mbw"
-                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
-                SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
-            }
-            steps {
-                reconfigure_wca()
-                start_wca()
-                echo 'Start baseline workloads.'
-                start_workloads("${EXTRA_ANSIBLE_PARAMS}", "specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", "${MBW_BASELINE_SLEEP}")
-                echo 'Start contender workload.'
-                start_workloads("${EXTRA_ANSIBLE_PARAMS}", "tensorflow_benchmark_prediction", "${MBW_CONTENDER_SLEEP}")
-                calculate_precision()
-            }
-            post {
-                always {
-                   clean("MBW", "mbw_results.csv")
+        stage("Run Memory Bandwidth experiment") {
+            failFast true
+            parallel {
+                stage("Run Memory Bandwidth experiment | Mesos") {
+                    when { expression { return params.MB } }
+                    agent {label 'mesos'}
+                    environment {
+                        MESOS_MASTER_HOST = "${MESOS}"
+                        MESOS_EXPECTED_TASKS = -1
+                        INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
+                        MIN_RECALL = -1
+                        MIN_PRECISION = -1
+                        BUILD_SCENARIO = "llc"
+                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                    }
+                    steps {
+                        memory_bandwidth_experiment()
+                    }
+                    post {
+                        always {
+                            clean("MBW", "mbw_results.csv")
+                        }
+                    }
+                }
+                stage("Run Memory Bandwidth experiment | Kubernetes") {
+                    when { expression { return params.MB } }
+                    agent {label 'kubernetes'}
+                    environment {
+                        KUBERNETES_HOST = "${KUBERNETES}"
+                        KUBERNETES_EXPECTED_TASKS = -1
+                        INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
+                        MIN_RECALL = -1
+                        MIN_PRECISION = -1
+                        BUILD_SCENARIO = "mbw"
+                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+                    }
+                    steps {
+                        memory_bandwidth_experiment()
+                    }
+                    post {
+                        always {
+                            clean("MBW", "mbw_results.csv")
+                        }
+                    }
                 }
             }
         }
-        stage("Run Memory Bandwidth experiment | Kubernetes") {
-            when {
-                expression { return params.MB }
-            }
-            agent {label 'kubernetes'}
-            environment {
-                KUBERNETES_HOST = "${KUBERNETES}"
-                KUBERNETES_EXPECTED_TASKS = -1
-                INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
-                MIN_RECALL = -1
-                MIN_PRECISION = -1
-                BUILD_SCENARIO = "mbw"
-                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
-                SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
-            }
-            steps {
-                reconfigure_wca()
-                start_wca()
-                echo 'Start baseline workloads.'
-                start_workloads("${EXTRA_ANSIBLE_PARAMS}", "specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", "${MBW_BASELINE_SLEEP}")
-                echo 'Start contender workload.'
-                start_workloads("${EXTRA_ANSIBLE_PARAMS}", "tensorflow_benchmark_prediction", "${MBW_CONTENDER_SLEEP}")
-                calculate_precision()
-            }
-            post {
-                always {
-                   clean("MBW", "mbw_results.csv")
-                }
-            }
-        }
-
     }
 }
 
@@ -328,5 +312,15 @@ def llc_experiment() {
 	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
 	echo 'Start contender workload.'
 	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
+    calculate_precision()
+}
+
+def memory_bandwidth_experiment() {
+    reconfigure_wca()
+    start_wca()
+    echo 'Start baseline workloads.'
+    start_workloads("${EXTRA_ANSIBLE_PARAMS}", "specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", "${MBW_BASELINE_SLEEP}")
+    echo 'Start contender workload.'
+    start_workloads("${EXTRA_ANSIBLE_PARAMS}", "tensorflow_benchmark_prediction", "${MBW_CONTENDER_SLEEP}")
     calculate_precision()
 }
