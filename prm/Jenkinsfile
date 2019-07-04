@@ -29,7 +29,6 @@ pipeline {
     stages {
         stage('Build pex') {
             when { expression { return params.BUILD_PEX } }
-            agent {label 'mesos && kubernetes'}
             stages {
                 stage("Prepare venv && build pex") {
                     steps {
