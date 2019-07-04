@@ -2,7 +2,6 @@ pipeline {
 //    triggers {
 //        cron('H/30 * * * *')
 //    }
-    agent { label 'mesos' }
     environment {
         PLAYBOOK='prm/workload-collocation-agent/workloads/run_workloads.yaml'
         INVENTORY='prm/demo_scenarios/common/inventory.yaml'
@@ -29,6 +28,7 @@ pipeline {
     stages {
         stage('Build pex') {
             when { expression { return params.BUILD_PEX } }
+            agent {label 'mesos && kubernetes'}
             stages {
                 stage("Prepare venv && build pex") {
                     steps {
@@ -39,6 +39,7 @@ pipeline {
             }
         stage("Prepare aurora cluster") {
             when { expression { return params.MB | params.LLC} }
+            agent {label 'mesos'}
             steps {
                 sh'''
                 mkdir -p ${HOME}/.aurora
@@ -47,8 +48,9 @@ pipeline {
             }
         }
 
-        stage("Run LLC Metrics Collection") {
+        stage("Run LLC Metrics Collection on Mesos") {
             when { expression { return params.BUILD_LLC_MODEL } }
+            agent {label 'mesos'}
             environment {
                 MESOS_EXPECTED_TASKS = -1
                 BUILD_SCENARIO = "llc"
@@ -71,6 +73,7 @@ pipeline {
 
         stage("Run LLC experiment") {
             when { expression { return params.LLC } }
+            agent {label 'mesos'}
             environment {
                 MESOS_EXPECTED_TASKS = -1
                 MIN_RECALL = -1
@@ -103,6 +106,7 @@ pipeline {
             when {
                 expression { return params.MB }
             }
+            agent {label 'mesos'}
             environment {
                 MESOS_EXPECTED_TASKS = -1
                 MIN_RECALL = -1
@@ -128,6 +132,8 @@ pipeline {
                 }
             }
         }
+
+
     }
 }
 
