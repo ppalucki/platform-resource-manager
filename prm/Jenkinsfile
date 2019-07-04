@@ -14,7 +14,7 @@ pipeline {
         MBW_BASELINE_SLEEP = 5
         MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
-        EXTRA_ANSIBLE_PARAMS = ""
+        EXTRA_ANSIBLE_PARAMS = " "
     }
     options {
         disableConcurrentBuilds()
