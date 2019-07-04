@@ -100,72 +100,57 @@ pipeline {
             }
         }
 
-        stage("Run LLC experiment | Mesos") {
-            when { expression { return params.LLC } }
-            agent {label 'mesos'}
-            environment {
-                MESOS_MASTER_HOST = "${MESOS}"
-                MESOS_EXPECTED_TASKS = -1
-                INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
-                MIN_RECALL = -1
-                MIN_PRECISION = -1
-                BUILD_SCENARIO = "llc"
-                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
-                SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-            }
-            steps {
-                reconfigure_wca()
-                start_wca()
-                dir('prm/workload-collocation-agent/workloads'){
-                    sh 'sed -i s/number_of_rows=100000$/number_of_rows=10000/g ./cassandra_stress/cassandra_stress.aurora'
-                    sh 'sed -i s/40000/2000/g ./mutilate/mutilate.aurora'
-                    sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
+        stage("Run LLC experiment") {
+            failFast true
+            parallel {
+                stage("Run LLC experiment | Mesos") {
+                    when { expression { return params.LLC } }
+                    agent {label 'mesos'}
+                    environment {
+                        MESOS_MASTER_HOST = "${MESOS}"
+                        MESOS_EXPECTED_TASKS = -1
+                        INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
+                        MIN_RECALL = -1
+                        MIN_PRECISION = -1
+                        BUILD_SCENARIO = "llc"
+                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                    }
+                    steps {
+                        llc_experiment()
+                    }
+                    post {
+                        always {
+                            clean("LLC", "llc_results.csv")
+                        }
+                    }
                 }
-                echo 'Start baseline workloads.'
-				start_workloads("${EXTRA_ANSIBLE_PARAMS}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
-				echo 'Start contender workload.'
-				start_workloads("${EXTRA_ANSIBLE_PARAMS}", "cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
-                calculate_precision()
-            }
-            post {
-                always {
-                    clean("LLC", "llc_results.csv")
-                }
-            }
-        }
-        stage("Run LLC experiment | Kubernetes") {
-            when { expression { return params.LLC } }
-            agent {label 'kubernetes'}
-            environment {
-                KUBERNETES_HOST = "${KUBERNETES}"
-                KUBERNETES_EXPECTED_TASKS = -1
-                INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
-                MIN_RECALL = -1
-                MIN_PRECISION = -1
-                BUILD_SCENARIO = "llc"
-                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
-                SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-            }
-            steps {
-                reconfigure_wca()
-                start_wca()
-                dir('prm/workload-collocation-agent/workloads'){
-                    sh 'sed -i s/number_of_rows=100000$/number_of_rows=10000/g ./cassandra_stress/cassandra_stress.aurora'
-                    sh 'sed -i s/40000/2000/g ./mutilate/mutilate.aurora'
-                    sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
-                }
-                echo 'Start baseline workloads.'
-				start_workloads("${EXTRA_ANSIBLE_PARAMS}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
-				echo 'Start contender workload.'
-				start_workloads("${EXTRA_ANSIBLE_PARAMS}", "cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
-                calculate_precision()
-            }
-            post {
-                always {
-                    clean("LLC", "llc_results.csv")
+                stage("Run LLC experiment | Kubernetes") {
+                    when { expression { return params.LLC } }
+                    agent {label 'kubernetes'}
+                    environment {
+                        KUBERNETES_HOST = "${KUBERNETES}"
+                        KUBERNETES_EXPECTED_TASKS = -1
+                        INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
+                        MIN_RECALL = -1
+                        MIN_PRECISION = -1
+                        BUILD_SCENARIO = "llc"
+                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                    }
+                    steps {
+                        llc_experiment()
+                    }
+                    post {
+                        always {
+                            clean("LLC", "llc_results.csv")
+                        }
+                    }
                 }
             }
         }
+
+
+
+
         stage("Run Memory Bandwidth experiment | Mesos") {
             when {
                 expression { return params.MB }
@@ -328,5 +313,20 @@ def llc_metrics_collection() {
     start_wca()
     echo 'Start baseline workloads.'
     start_workloads("${EXTRA_ANSIBLE_PARAMS}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_COLLECT_SLEEP}")
+    calculate_precision()
+}
+
+def llc_experiment() {
+    reconfigure_wca()
+    start_wca()
+    dir('prm/workload-collocation-agent/workloads') {
+        sh 'sed -i s/number_of_rows=100000$/number_of_rows=10000/g ./cassandra_stress/cassandra_stress.aurora'
+        sh 'sed -i s/40000/2000/g ./mutilate/mutilate.aurora'
+        sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
+    }
+    echo 'Start baseline workloads.'
+	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
+	echo 'Start contender workload.'
+	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
     calculate_precision()
 }
