@@ -73,7 +73,9 @@ pipeline {
                         llc_metrics_collection()
                     }
                     post {
-                        clean("LLC", "llc_results.csv")
+                        always {
+                            clean("LLC", "llc_results.csv")
+                        }
                     }
                 }
                 stage("Run LLC Metrics Collection | Kubernetes") {
@@ -83,14 +85,16 @@ pipeline {
                         KUBERNETES_HOST = "${KUBERNETES}"
                         KUBERNETES_EXPECTED_TASKS = -1
                         INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
-                        BUILD_SCENARIO = "llc"
+                        BUILD_SCENARIO = "llc"  
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                     }
                     steps {
                         llc_metrics_collection()
                     }
                     post {
-                        clean("LLC", "llc_results.csv")
+                        always {
+                            clean("LLC", "llc_results.csv")
+                        }
                     }
                 }
             }
