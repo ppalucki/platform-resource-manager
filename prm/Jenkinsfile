@@ -5,9 +5,9 @@ pipeline {
     agent any
     environment {
         PLAYBOOK='prm/workload-collocation-agent/workloads/run_workloads.yaml'
-        INVENTORY='prm/demo_scenarios/common/inventory.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
-        MESOS_MASTER_HOST='100.64.176.23'
+        MESOS='100.64.176.23'
+        KUBERNETES='100.64.176.34'
         LLC_BASELINE_SLEEP = 180 
         LLC_COLLECT_SLEEP = 36000
         LLC_CONTENDER_SLEEP = 180
@@ -54,12 +54,13 @@ pipeline {
                 '''
             }
         }
-
         stage("Run LLC Metrics Collection on Mesos") {
             when { expression { return params.BUILD_LLC_MODEL } }
             agent {label 'mesos'}
             environment {
+                MESOS_MASTER_HOST = "${MESOS}"
                 MESOS_EXPECTED_TASKS = -1
+                INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
                 BUILD_SCENARIO = "llc"
                 SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
@@ -77,12 +78,37 @@ pipeline {
                 }
             }
         }
-
-        stage("Run LLC experiment") {
+        stage("Run LLC Metrics Collection on Kubernetes") {
+            when { expression { return params.BUILD_LLC_MODEL } }
+            agent {label 'kubernetes'}
+            environment {
+                KUBERNETES_HOST = "${KUBERNETES}"
+                KUBERNETES_EXPECTED_TASKS = -1
+                INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
+                BUILD_SCENARIO = "llc"
+                SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
+            }
+            steps {
+                reconfigure_wca()
+                start_wca()
+                echo 'Start baseline workloads.'
+                start_workloads("${EXTRA_ANSIBLE_PARAMS}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_COLLECT_SLEEP}")
+                calculate_precision()
+            }
+            post {
+                always {
+                    clean("LLC", "llc_results.csv")
+                }
+            }
+        }
+        stage("Run LLC experiment | Mesos") {
             when { expression { return params.LLC } }
             agent {label 'mesos'}
             environment {
+                MESOS_MASTER_HOST = "${MESOS}"
                 MESOS_EXPECTED_TASKS = -1
+                INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
                 MIN_RECALL = -1
                 MIN_PRECISION = -1
                 BUILD_SCENARIO = "llc"
@@ -109,21 +135,54 @@ pipeline {
                 }
             }
         }
-        stage("Run Memory Bandwidth experiment") {
+        stage("Run LLC experiment | Kubernetes") {
+            when { expression { return params.LLC } }
+            agent {label 'kubernetes'}
+            environment {
+                KUBERNETES_HOST = "${KUBERNETES}"
+                KUBERNETES_EXPECTED_TASKS = -1
+                INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
+                MIN_RECALL = -1
+                MIN_PRECISION = -1
+                BUILD_SCENARIO = "llc"
+                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
+                SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+            }
+            steps {
+                reconfigure_wca()
+                start_wca()
+                dir('prm/workload-collocation-agent/workloads'){
+                    sh 'sed -i s/number_of_rows=100000$/number_of_rows=10000/g ./cassandra_stress/cassandra_stress.aurora'
+                    sh 'sed -i s/40000/2000/g ./mutilate/mutilate.aurora'
+                    sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
+                }
+                echo 'Start baseline workloads.'
+				start_workloads("${EXTRA_ANSIBLE_PARAMS}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
+				echo 'Start contender workload.'
+				start_workloads("${EXTRA_ANSIBLE_PARAMS}", "cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
+                calculate_precision()
+            }
+            post {
+                always {
+                    clean("LLC", "llc_results.csv")
+                }
+            }
+        }
+        stage("Run Memory Bandwidth experiment | Mesos") {
             when {
                 expression { return params.MB }
             }
             agent {label 'mesos'}
             environment {
+                MESOS_MASTER_HOST = "${MESOS}"
                 MESOS_EXPECTED_TASKS = -1
+                INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
                 MIN_RECALL = -1
                 MIN_PRECISION = -1
                 BUILD_SCENARIO = "mbw"
                 LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
                 SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
             }
-
-
             steps {
                 reconfigure_wca()
                 start_wca()
@@ -139,7 +198,36 @@ pipeline {
                 }
             }
         }
-
+        stage("Run Memory Bandwidth experiment | Kubernetes") {
+            when {
+                expression { return params.MB }
+            }
+            agent {label 'kubernetes'}
+            environment {
+                KUBERNETES_HOST = "${KUBERNETES}"
+                KUBERNETES_EXPECTED_TASKS = -1
+                INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
+                MIN_RECALL = -1
+                MIN_PRECISION = -1
+                BUILD_SCENARIO = "mbw"
+                LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
+                SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+            }
+            steps {
+                reconfigure_wca()
+                start_wca()
+                echo 'Start baseline workloads.'
+                start_workloads("${EXTRA_ANSIBLE_PARAMS}", "specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", "${MBW_BASELINE_SLEEP}")
+                echo 'Start contender workload.'
+                start_workloads("${EXTRA_ANSIBLE_PARAMS}", "tensorflow_benchmark_prediction", "${MBW_CONTENDER_SLEEP}")
+                calculate_precision()
+            }
+            post {
+                always {
+                   clean("MBW", "mbw_results.csv")
+                }
+            }
+        }
 
     }
 }
