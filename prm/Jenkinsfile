@@ -30,7 +30,6 @@ pipeline {
         stage('Build pex') {
             when { expression { return params.BUILD_PEX } }
             stages {
-                parallel {
                     stage("Prepare venv && build pex | Mesos") {
                         agent { label 'mesos' }
                         steps {
@@ -43,7 +42,6 @@ pipeline {
                             build_pex()
                             }
                         }
-                }
             }
         }
         stage("Prepare aurora cluster") {
