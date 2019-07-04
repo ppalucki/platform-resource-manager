@@ -2,6 +2,7 @@ pipeline {
 //    triggers {
 //        cron('H/30 * * * *')
 //    }
+    agent any
     environment {
         PLAYBOOK='prm/workload-collocation-agent/workloads/run_workloads.yaml'
         INVENTORY='prm/demo_scenarios/common/inventory.yaml'
