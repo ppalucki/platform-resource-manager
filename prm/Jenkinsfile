@@ -15,7 +15,7 @@ pipeline {
         MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
         EXTRA_ANSIBLE_PARAMS = " "
-        LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
+        LABELS='''{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}'''
     }
     options {
         disableConcurrentBuilds()
@@ -147,7 +147,6 @@ pipeline {
                 }
             }
         }
-
 
         stage("Run Memory Bandwidth experiment") {
             failFast true
