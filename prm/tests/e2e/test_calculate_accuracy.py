@@ -24,6 +24,7 @@ from prm.accuracy import (build_prometheus_url, fetch_metrics,
 
 import requests
 from time import time
+from urllib.parse import urljoin
 
 
 def _get_mesos_running_tasks(mesos_master_host):
@@ -40,11 +41,24 @@ def _get_mesos_running_tasks(mesos_master_host):
         return sorted([t['name'] for t in tasks['get_tasks']['tasks']])
 
 
+def _get_kubernetes_running_tasks(kubernetes_host, crt_path):
+    kubelet_endpoint = 'https://{}:10250'.format(kubernetes_host)
+    PODS_PATH = '/pods'
+    client_cert = os.path.join(crt_path, 'apiserver-kubelet-client.crt')
+    client_private_key = os.path.join(crt_path, 'apiserver-kubelet-client.key')
+
+    full_url = urljoin(kubelet_endpoint, PODS_PATH)
+    r = requests.get(full_url, json=dict(type='GET_STATE'),
+                     verify=False, cert=(client_cert, client_private_key))
+    r.raise_for_status()
+    return r.json()
+
+
 def test_integration_accurracy(record_property):
-    """ Integration tests to check number of runnings tasks during scenario
-    and calculate and output them to csv file for visulization. """
-    assert 'MESOS_MASTER_HOST' in os.environ, 'required to get number of running tasks'
-    assert 'MESOS_EXPECTED_TASKS' in os.environ, 'required to check number of tasks running'
+    """ Integration tests to check number of running tasks during scenario
+    and calculate and output them to csv file for visualization. """
+    assert ('MESOS_MASTER_HOST' in os.environ or 'KUBERNETES_HOST' in os.environ), 'required to get number of running tasks'
+    assert ('MESOS_EXPECTED_TASKS' in os.environ or 'KUBERNETES_EXPECTED_TASKS' in os.environ), 'required to check number of tasks running'
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
     assert 'BUILD_NUMBER' in os.environ
     assert 'BUILD_COMMIT' in os.environ
@@ -52,7 +66,17 @@ def test_integration_accurracy(record_property):
     assert 'MIN_RECALL' in os.environ
     assert 'MIN_PRECISION' in os.environ
 
-    mesos_master_host = os.environ['MESOS_MASTER_HOST']
+    mesos_master_host = None
+    kubernetes_host = None
+
+    if os.environ.get('MESOS_MASTER_HOST'):
+        mesos_master_host = os.environ['MESOS_MASTER_HOST']
+        mesos_expected_tasks = int(os.environ['MESOS_EXPECTED_TASKS'])
+    elif os.environ.get('KUBERNETES_HOST'):
+        kubernetes_host = os.environ['KUBERNETES_HOST']
+        assert 'CRT_PATH' in os.environ
+        kubernetes_expected_tasks = int(os.environ['KUBERNETES_EXPECTED_TASKS'])
+
     prometheus = os.environ['PROMETHEUS']
     build_number = int(os.environ['BUILD_NUMBER'])
     build_commit = os.environ['BUILD_COMMIT']
@@ -60,7 +84,6 @@ def test_integration_accurracy(record_property):
     tags = dict(build_number=build_number,
                 build_scenario=build_scenario,
                 build_commit=build_commit)
-    mesos_expected_tasks = int(os.environ['MESOS_EXPECTED_TASKS'])
     window_size = float(os.environ.get('WINDOW_SIZE', 10.0))
     min_recall = float(os.environ.get('MIN_RECALL', -1))
     min_precision = float(os.environ.get('MIN_PRECISION', -1))
@@ -71,10 +94,19 @@ def test_integration_accurracy(record_property):
     logging.info('min precision = %r', min_precision)
 
     # Check running tasks.
-    tasks = _get_mesos_running_tasks(mesos_master_host)
-    logging.info('tasks = %s', len(tasks))
-    assert len(tasks) >= mesos_expected_tasks, \
-        'invalid number of tasks: %r (expected=%r)' % (len(tasks), mesos_expected_tasks)
+    if mesos_master_host:
+        tasks = _get_mesos_running_tasks(mesos_master_host)
+        logging.info('tasks = %s', len(tasks))
+        assert len(tasks) >= mesos_expected_tasks, \
+            'invalid number of tasks: %r (expected=%r)' % (
+            len(tasks), mesos_expected_tasks)
+    else:
+        tasks = _get_kubernetes_running_tasks(kubernetes_host,
+                                              os.environ.get('CRT_PATH'))
+        logging.info('tasks = %s', len(tasks))
+        assert len(tasks) >= kubernetes_expected_tasks, \
+            'invalid number of tasks: %r (expected=%r)' % (
+            len(tasks), kubernetes_expected_tasks)
 
     # Calculate results.
     prometheus_anomalies_query = build_prometheus_url(prometheus, 'anomaly',
