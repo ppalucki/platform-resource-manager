@@ -30,20 +30,22 @@ pipeline {
         stage('Build pex') {
             when { expression { return params.BUILD_PEX } }
             stages {
-                stage("Prepare venv && build pex | Mesos") {
-                    agent { label 'mesos' }
-                    steps {
-                        build_pex()
+                parallel {
+                    stage("Prepare venv && build pex | Mesos") {
+                        agent { label 'mesos' }
+                        steps {
+                            build_pex()
+                            }
                         }
-                    }
-                stage("Prepare venv && build pex | Kubernetes") {
-                    agent { label 'kubernetes' }
-                    steps {
-                        build_pex()
+                    stage("Prepare venv && build pex | Kubernetes") {
+                        agent { label 'kubernetes' }
+                        steps {
+                            build_pex()
+                            }
                         }
-                    }
                 }
             }
+        }
         stage("Prepare aurora cluster") {
             when { expression { return params.MB | params.LLC} }
             agent {label 'mesos'}
@@ -54,7 +56,7 @@ pipeline {
                 '''
             }
         }
-        stage("Run LLC Metrics Collection on Mesos") {
+        stage("Run LLC Metrics Collection | Mesos") {
             when { expression { return params.BUILD_LLC_MODEL } }
             agent {label 'mesos'}
             environment {
@@ -78,7 +80,7 @@ pipeline {
                 }
             }
         }
-        stage("Run LLC Metrics Collection on Kubernetes") {
+        stage("Run LLC Metrics Collection | Kubernetes") {
             when { expression { return params.BUILD_LLC_MODEL } }
             agent {label 'kubernetes'}
             environment {
