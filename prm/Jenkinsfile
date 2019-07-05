@@ -267,7 +267,7 @@ def start_wca() {
 
 def start_workloads(extra_params, tags, sleep_time) {
     dir('prm/workload-collocation-agent/workloads'){
-        sh 'ansible-playbook  ${extra_params}  -i ${WORKSPACE}/${SCENARIO_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=${tags} -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
+        sh """ansible-playbook  ${extra_params}  -i ${WORKSPACE}/${SCENARIO_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=${tags} -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}"""
         sleep sleep_time
     }
 
@@ -315,9 +315,9 @@ def llc_experiment() {
         sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
     }
     echo 'Start baseline workloads.'
-	start_workloads("${EXTRA_ANSIBLE_PARAMS}", '''twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra''', "${LLC_BASELINE_SLEEP}")
+	start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_BASELINE_SLEEP}")
 	echo 'Start contender workload.'
-	start_workloads("${EXTRA_ANSIBLE_PARAMS}", '''cassandra_stress--stress''', "${LLC_CONTENDER_SLEEP}")
+	start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'cassandra_stress--stress', "${LLC_CONTENDER_SLEEP}")
     calculate_precision()
 }
 
