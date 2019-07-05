@@ -137,7 +137,7 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
+                        LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
                     }
                     steps {
                         llc_experiment()
@@ -315,9 +315,9 @@ def llc_experiment() {
         sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
     }
     echo 'Start baseline workloads.'
-	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_BASELINE_SLEEP}")
+	start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_BASELINE_SLEEP}")
 	echo 'Start contender workload.'
-	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "cassandra_stress--stress", "${LLC_CONTENDER_SLEEP}")
+	start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'cassandra_stress--stress', "${LLC_CONTENDER_SLEEP}")
     calculate_precision()
 }
 
