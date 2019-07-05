@@ -9,7 +9,7 @@ pipeline {
         MESOS='100.64.176.23'
         KUBERNETES='100.64.176.34'
         LLC_BASELINE_SLEEP = 180 
-        LLC_COLLECT_SLEEP = 36000
+        LLC_COLLECT_SLEEP = 180
         LLC_CONTENDER_SLEEP = 180
         MBW_BASELINE_SLEEP = 5
         MBW_CONTENDER_SLEEP = 5
@@ -23,8 +23,8 @@ pipeline {
     parameters {
         booleanParam(name: 'BUILD_PEX', defaultValue: true, description: 'Build wca-pex')
         booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
-        booleanParam(name: 'BUILD_LLC_MODEL', defaultValue: false, description: 'Build Model For LLC Contention')
-        booleanParam(name: 'MB', defaultValue: false, description: 'Run MBW experiment')
+        booleanParam(name: 'BUILD_LLC_MODEL', defaultValue: true, description: 'Build Model For LLC Contention')
+        booleanParam(name: 'MB', defaultValue: true, description: 'Run MBW experiment')
     }
     stages {
         stage('Build pex') {
