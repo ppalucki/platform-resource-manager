@@ -87,6 +87,7 @@ pipeline {
                         INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        CRT_PATH = "/etc/kubernetes/ssl"
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -137,6 +138,7 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        CRT_PATH = "/etc/kubernetes/ssl"
                         LABELS="""additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -187,6 +189,7 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+                        CRT_PATH = "/etc/kubernetes/ssl"
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
