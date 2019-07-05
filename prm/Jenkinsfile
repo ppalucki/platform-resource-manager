@@ -67,7 +67,7 @@ pipeline {
                         INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-                        LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
+                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
                         llc_metrics_collection()
@@ -87,7 +87,7 @@ pipeline {
                         INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
+                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
                         llc_metrics_collection()
@@ -165,8 +165,7 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
-
+                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
                         memory_bandwidth_experiment()
@@ -188,8 +187,7 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
-                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
-
+                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
                         memory_bandwidth_experiment()
@@ -302,7 +300,7 @@ def llc_metrics_collection() {
     reconfigure_wca()
     start_wca()
     echo 'Start baseline workloads.'
-    start_workloads("${EXTRA_ANSIBLE_PARAMS}", "twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra", "${LLC_COLLECT_SLEEP}")
+    start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_COLLECT_SLEEP}")
     calculate_precision()
 }
 
@@ -325,8 +323,8 @@ def memory_bandwidth_experiment() {
     reconfigure_wca()
     start_wca()
     echo 'Start baseline workloads.'
-    start_workloads("${EXTRA_ANSIBLE_PARAMS}", "specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress", "${MBW_BASELINE_SLEEP}")
+    start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'specjbb,tensorflow_benchmark_prediction,tensorflow_benchmark_train,cassandra_stress', "${MBW_BASELINE_SLEEP}")
     echo 'Start contender workload.'
-    start_workloads("${EXTRA_ANSIBLE_PARAMS}", "tensorflow_benchmark_prediction", "${MBW_CONTENDER_SLEEP}")
+    start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'tensorflow_benchmark_prediction', "${MBW_CONTENDER_SLEEP}")
     calculate_precision()
 }
