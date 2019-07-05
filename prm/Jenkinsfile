@@ -15,7 +15,6 @@ pipeline {
         MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
         EXTRA_ANSIBLE_PARAMS = " "
-        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
     }
     options {
         disableConcurrentBuilds()
@@ -68,6 +67,7 @@ pipeline {
                         INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
                     }
                     steps {
                         llc_metrics_collection()
@@ -87,6 +87,7 @@ pipeline {
                         INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
                     }
                     steps {
                         llc_metrics_collection()
@@ -114,6 +115,7 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
                     }
                     steps {
                         llc_experiment()
@@ -135,6 +137,7 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
                     }
                     steps {
                         llc_experiment()
@@ -162,6 +165,8 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
+
                     }
                     steps {
                         memory_bandwidth_experiment()
@@ -183,6 +188,8 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
+
                     }
                     steps {
                         memory_bandwidth_experiment()
