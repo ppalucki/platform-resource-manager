@@ -67,7 +67,7 @@ pipeline {
                         INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
+                        LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"
                     }
                     steps {
                         llc_metrics_collection()
@@ -115,7 +115,7 @@ pipeline {
                         MIN_PRECISION = -1
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-                        LABELS="""{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\", build_scenario: \"$BUILD_SCENARIO\"}}"""
+                        LABELS='{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}''
                     }
                     steps {
                         llc_experiment()
@@ -267,7 +267,7 @@ def start_wca() {
 
 def start_workloads(extra_params, tags, sleep_time) {
     dir('prm/workload-collocation-agent/workloads'){
-        sh """ansible-playbook  ${extra_params}  -i ${WORKSPACE}/${SCENARIO_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=${tags} -e \"${LABELS}\" ${WORKSPACE}/${PLAYBOOK}"""
+        sh 'ansible-playbook  ${extra_params}  -i ${WORKSPACE}/${SCENARIO_INVENTORY} -i ${WORKSPACE}/${INVENTORY} --tags=${tags} -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'
         sleep sleep_time
     }
 
