@@ -318,5 +318,5 @@ def replace_commit() {
                 configs: [
                     fileContentReplaceItemConfig( search: 'GIT_COMMIT', replace: "${commit}", matchCount: 0)],
                 fileEncoding: 'UTF-8',
-                filePath: "${WORKSPACE}/${SCENARIO_INVENTORY}")])
+                filePath: "${WORKSPACE}/${INVENTORY}")])
 }
