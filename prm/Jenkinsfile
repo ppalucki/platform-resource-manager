@@ -208,6 +208,7 @@ def reconfigure_wca() {
     sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
     sh 'sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca.service /etc/systemd/system/wca.service'
     sh 'sudo systemctl daemon-reload'
+    replace_commit("${SCENARIO_INVENTORY}")
     contentReplace(
         configs: [
             fileContentReplaceConfig(
@@ -300,4 +301,22 @@ def memory_bandwidth_experiment() {
     echo 'Start contender workload.'
     start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'tensorflow_benchmark_prediction', "${MBW_CONTENDER_SLEEP}")
     calculate_precision()
+}
+
+def get_submodule_commit(submodule_dir) {
+    dir("${submodule_dir}") {
+        git_commit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        git_commit
+    }
+}
+
+def replace_commit(path) {
+    commit = get_submodule_commit("prm/workload-collocation-agent")
+    contentReplace(
+        configs: [
+            fileContentReplaceConfig(
+                configs: [
+                fileContentReplaceItemConfig( search: 'GIT_COMMIT', replace: "${commit}", matchCount: 0),
+            fileEncoding: 'UTF-8',
+            filePath: "${path}")])
 }
