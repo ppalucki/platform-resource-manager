@@ -208,7 +208,7 @@ def reconfigure_wca() {
     sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
     sh 'sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca.service /etc/systemd/system/wca.service'
     sh 'sudo systemctl daemon-reload'
-    replace_commit("${SCENARIO_INVENTORY}")
+    replace_commit()
     contentReplace(
         configs: [
             fileContentReplaceConfig(
@@ -310,13 +310,13 @@ def get_submodule_commit(submodule_dir) {
     }
 }
 
-def replace_commit(path) {
+def replace_commit() {
     commit = get_submodule_commit("prm/workload-collocation-agent")
     contentReplace(
         configs: [
             fileContentReplaceConfig(
                 configs: [
-                fileContentReplaceItemConfig( search: 'GIT_COMMIT', replace: "${commit}", matchCount: 0),
-            fileEncoding: 'UTF-8',
-            filePath: "${path}")])
+                    fileContentReplaceItemConfig( search: 'GIT_COMMIT', replace: "${commit}", matchCount: 0)],
+                fileEncoding: 'UTF-8',
+                filePath: "${WORKSPACE}/${SCENARIO_INVENTORY}")])
 }
