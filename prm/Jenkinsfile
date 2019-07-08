@@ -52,7 +52,6 @@ pipeline {
                 INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
                 MIN_RECALL = -1
                 MIN_PRECISION = -1
-                LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
             }
             stages {
                 stage("Prepare aurora cluster") {
@@ -69,6 +68,8 @@ pipeline {
                         environment {
                             SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                             BUILD_SCENARIO = "llc"
+                            LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
+
                         }
                         steps {
                             llc_metrics_collection()
@@ -84,6 +85,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
                         llc_experiment()
@@ -99,6 +101,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
                         memory_bandwidth_experiment()
@@ -118,7 +121,6 @@ pipeline {
                 KUBERNETES_EXPECTED_TASKS = -1
                 INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
                 CRT_PATH = "/etc/kubernetes/ssl"
-                LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
             }
             stages {
                 stage("Run LLC Metrics Collection | Kubernetes") {
@@ -126,6 +128,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
                         llc_metrics_collection()
@@ -141,6 +144,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
                         llc_experiment()
@@ -156,6 +160,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
                         memory_bandwidth_experiment()
