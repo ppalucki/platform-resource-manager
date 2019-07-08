@@ -55,7 +55,6 @@ pipeline {
             }
         }
         stage("Mesos") {
-            agent {label 'mesos'}
             environment {
                 MESOS_MASTER_HOST = "${MESOS}"
                 MESOS_EXPECTED_TASKS = -1
@@ -66,6 +65,7 @@ pipeline {
             }
             stage("Run LLC Metrics Collection | Mesos") {
                     when { expression { return params.BUILD_LLC_MODEL } }
+                    agent {label 'mesos'}
                     environment {
                         INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
                         BUILD_SCENARIO = "llc"
@@ -81,6 +81,7 @@ pipeline {
             }
             stage("Run LLC experiment | Mesos") {
                 when { expression { return params.LLC } }
+                agent {label 'mesos'}
                 environment {
                     BUILD_SCENARIO = "llc"
                     SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
@@ -96,6 +97,7 @@ pipeline {
             }
             stage("Run Memory Bandwidth experiment | Mesos") {
                 when { expression { return params.MB } }
+                agent {label 'mesos'}
                 environment {
                     BUILD_SCENARIO = "mbw"
                     SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
@@ -111,7 +113,6 @@ pipeline {
             }
         }
         stage("Kubernetes") {
-            agent {label 'kubernetes'}
             environment {
                 KUBERNETES_HOST = "${KUBERNETES}"
                 KUBERNETES_EXPECTED_TASKS = -1
@@ -121,6 +122,7 @@ pipeline {
             }
             stage("Run LLC Metrics Collection | Kubernetes") {
                 when { expression { return params.BUILD_LLC_MODEL } }
+                agent {label 'kubernetes'}
                 environment {
                     BUILD_SCENARIO = "llc"
                     SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
@@ -136,6 +138,7 @@ pipeline {
             }
             stage("Run LLC experiment | Kubernetes") {
                 when { expression { return params.LLC } }
+                agent {label 'kubernetes'}
                 environment {
                     BUILD_SCENARIO = "llc"
                     SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
@@ -151,6 +154,7 @@ pipeline {
             }
             stage("Run Memory Bandwidth experiment | Kubernetes") {
                 when { expression { return params.MB } }
+                agent {label 'kubernetes'}
                 environment {
                     BUILD_SCENARIO = "mbw"
                     SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
