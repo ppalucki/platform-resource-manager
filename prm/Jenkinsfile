@@ -121,7 +121,7 @@ pipeline {
                 CRT_PATH = "/etc/kubernetes/ssl"
                 LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
             }
-            steps {
+            stages {
                 stage("Run LLC Metrics Collection | Kubernetes") {
                     when { expression { return params.BUILD_LLC_MODEL } }
                     environment {
