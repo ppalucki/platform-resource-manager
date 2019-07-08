@@ -15,6 +15,8 @@ pipeline {
         MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
         EXTRA_ANSIBLE_PARAMS = " "
+        MIN_RECALL = -1
+        MIN_PRECISION = -1
     }
     options {
         disableConcurrentBuilds()
@@ -50,8 +52,6 @@ pipeline {
                 MESOS_MASTER_HOST = "${MESOS}"
                 MESOS_EXPECTED_TASKS = -1
                 INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
-                MIN_RECALL = -1
-                MIN_PRECISION = -1
             }
             stages {
                 stage("Prepare aurora cluster") {
