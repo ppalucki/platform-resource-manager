@@ -63,51 +63,53 @@ pipeline {
                 MIN_PRECISION = -1
                 LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
             }
-            stage("Run LLC Metrics Collection | Mesos") {
-                    when { expression { return params.BUILD_LLC_MODEL } }
+            steps {
+                stage("Run LLC Metrics Collection | Mesos") {
+                        when { expression { return params.BUILD_LLC_MODEL } }
+                        agent {label 'mesos'}
+                        environment {
+                            INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
+                            BUILD_SCENARIO = "llc"
+                        }
+                        steps {
+                            llc_metrics_collection()
+                        }
+                        post {
+                            always {
+                                clean("LLC", "llc_results.csv")
+                            }
+                        }
+                }
+                stage("Run LLC experiment | Mesos") {
+                    when { expression { return params.LLC } }
                     agent {label 'mesos'}
                     environment {
-                        INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
                         BUILD_SCENARIO = "llc"
+                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                     }
                     steps {
-                        llc_metrics_collection()
+                        llc_experiment()
                     }
                     post {
                         always {
                             clean("LLC", "llc_results.csv")
                         }
                     }
-            }
-            stage("Run LLC experiment | Mesos") {
-                when { expression { return params.LLC } }
-                agent {label 'mesos'}
-                environment {
-                    BUILD_SCENARIO = "llc"
-                    SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                 }
-                steps {
-                    llc_experiment()
-                }
-                post {
-                    always {
-                        clean("LLC", "llc_results.csv")
+                stage("Run Memory Bandwidth experiment | Mesos") {
+                    when { expression { return params.MB } }
+                    agent {label 'mesos'}
+                    environment {
+                        BUILD_SCENARIO = "mbw"
+                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
                     }
-                }
-            }
-            stage("Run Memory Bandwidth experiment | Mesos") {
-                when { expression { return params.MB } }
-                agent {label 'mesos'}
-                environment {
-                    BUILD_SCENARIO = "mbw"
-                    SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
-                }
-                steps {
-                    memory_bandwidth_experiment()
-                }
-                post {
-                    always {
-                        clean("MBW", "mbw_results.csv")
+                    steps {
+                        memory_bandwidth_experiment()
+                    }
+                    post {
+                        always {
+                            clean("MBW", "mbw_results.csv")
+                        }
                     }
                 }
             }
@@ -120,54 +122,57 @@ pipeline {
                 CRT_PATH = "/etc/kubernetes/ssl"
                 LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
             }
-            stage("Run LLC Metrics Collection | Kubernetes") {
-                when { expression { return params.BUILD_LLC_MODEL } }
-                agent {label 'kubernetes'}
-                environment {
-                    BUILD_SCENARIO = "llc"
-                    SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+            steps {
+                stage("Run LLC Metrics Collection | Kubernetes") {
+                    when { expression { return params.BUILD_LLC_MODEL } }
+                    agent {label 'kubernetes'}
+                    environment {
+                        BUILD_SCENARIO = "llc"
+                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                    }
+                    steps {
+                        llc_metrics_collection()
+                    }
+                    post {
+                        always {
+                            clean("LLC", "llc_results.csv")
+                        }
+                    }
                 }
-                steps {
-                    llc_metrics_collection()
+                stage("Run LLC experiment | Kubernetes") {
+                    when { expression { return params.LLC } }
+                    agent {label 'kubernetes'}
+                    environment {
+                        BUILD_SCENARIO = "llc"
+                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                    }
+                    steps {
+                        llc_experiment()
+                    }
+                    post {
+                        always {
+                            clean("LLC", "llc_results.csv")
+                        }
+                    }
                 }
-                post {
-                    always {
-                        clean("LLC", "llc_results.csv")
+                stage("Run Memory Bandwidth experiment | Kubernetes") {
+                    when { expression { return params.MB } }
+                    agent {label 'kubernetes'}
+                    environment {
+                        BUILD_SCENARIO = "mbw"
+                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+                    }
+                    steps {
+                        memory_bandwidth_experiment()
+                    }
+                    post {
+                        always {
+                            clean("MBW", "mbw_results.csv")
+                        }
                     }
                 }
             }
-            stage("Run LLC experiment | Kubernetes") {
-                when { expression { return params.LLC } }
-                agent {label 'kubernetes'}
-                environment {
-                    BUILD_SCENARIO = "llc"
-                    SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-                }
-                steps {
-                    llc_experiment()
-                }
-                post {
-                    always {
-                        clean("LLC", "llc_results.csv")
-                    }
-                }
-            }
-            stage("Run Memory Bandwidth experiment | Kubernetes") {
-                when { expression { return params.MB } }
-                agent {label 'kubernetes'}
-                environment {
-                    BUILD_SCENARIO = "mbw"
-                    SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
-                }
-                steps {
-                    memory_bandwidth_experiment()
-                }
-                post {
-                    always {
-                        clean("MBW", "mbw_results.csv")
-                    }
-                }
-            }
+        }
         }
     }
 }
