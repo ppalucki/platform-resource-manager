@@ -67,7 +67,7 @@ pipeline {
             steps {
                 stage("Run LLC Metrics Collection | Mesos") {
                         when { expression { return params.BUILD_LLC_MODEL } }
-                        environment {
+                        script {
                             SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                             BUILD_SCENARIO = "llc"
                         }
@@ -82,7 +82,7 @@ pipeline {
                 }
                 stage("Run LLC experiment | Mesos") {
                     when { expression { return params.LLC } }
-                    environment {
+                    script {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                     }
@@ -97,7 +97,7 @@ pipeline {
                 }
                 stage("Run Memory Bandwidth experiment | Mesos") {
                     when { expression { return params.MB } }
-                    environment {
+                    script {
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
                     }
