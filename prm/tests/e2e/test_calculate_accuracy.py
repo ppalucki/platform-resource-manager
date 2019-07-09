@@ -78,9 +78,14 @@ def test_metrics():
                     workload_name=workload.split('--')[0],
                     env_uniq_id=env_uniq_id)
         sli_query = build_prometheus_url(prometheus, 'sli',
-                                         tags, 1800, time())
+                                         tags, 600, time())
         sli_metrics = fetch_metrics(sli_query)
         assert len(sli_metrics['data']['result']) > 0
+
+        anomaly_count_query = build_prometheus_url(prometheus, 'anomaly_count',
+                                                   tags, 600, time())
+        anomaly_count_metrics = fetch_metrics(anomaly_count_query)
+        assert len(anomaly_count_metrics['data']['result']) > 0
 
 
 def test_integration_accurracy(record_property):
