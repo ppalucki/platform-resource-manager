@@ -78,7 +78,7 @@ def test_metrics():
                     workload_name=workload.split('--')[0],
                     env_uniq_id=env_uniq_id)
         sli_query = build_prometheus_url(prometheus, 'sli',
-                                         tags, 600, time())
+                                         tags, 1200, time())
         sli_metrics = fetch_metrics(sli_query)
         assert len(sli_metrics['data']['result']) > 0
 
@@ -86,7 +86,7 @@ def test_metrics():
                     build_commit=build_commit,
                     env_uniq_id=env_uniq_id)
         anomaly_count_query = build_prometheus_url(prometheus, 'anomaly_count',
-                                                   tags, 600, time())
+                                                   tags, 1200, time())
         anomaly_count_metrics = fetch_metrics(anomaly_count_query)
         assert len(anomaly_count_metrics['data']['result']) > 0
 
