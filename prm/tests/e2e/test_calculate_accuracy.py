@@ -54,6 +54,35 @@ def _get_kubernetes_running_tasks(kubernetes_host, crt_path):
     return r.json()
 
 
+def test_metrics():
+    assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
+    assert 'BUILD_NUMBER' in os.environ
+    assert 'BUILD_COMMIT' in os.environ
+    assert ('KUBERNETES_HOST' in os.environ) or ('MESOS_AGENT' in os.environ)
+
+    prometheus = os.environ['PROMETHEUS']
+    build_number = int(os.environ['BUILD_NUMBER'])
+    build_commit = os.environ['BUILD_COMMIT']
+
+    if os.environ.get('KUBERNETES_HOST'):
+        env_uniq_id = os.environ['KUBERNETES_HOST'].split('.')[3]
+    else:
+        env_uniq_id = os.environ['MESOS_AGENT'].split('.')[3]
+
+    workloads = list()
+    workloads.append(os.environ.get('TAGS'))
+    workloads.append(os.environ.get('CONTENDER_TAGS'))
+    for workload in workloads:
+        tags = dict(build_number=build_number,
+                    build_commit=build_commit,
+                    workload_name=workload.split('--')[0],
+                    env_uniq_id=env_uniq_id)
+        sli_query = build_prometheus_url(prometheus, 'sli',
+                                         tags, 1800, time())
+        sli_metrics = fetch_metrics(sli_query)
+        assert len(sli_metrics['data']['result']) > 0
+
+
 def test_integration_accurracy(record_property):
     """ Integration tests to check number of running tasks during scenario
     and calculate and output them to csv file for visualization. """
