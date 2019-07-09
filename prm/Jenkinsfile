@@ -50,6 +50,7 @@ pipeline {
             agent {label 'mesos'}
             environment {
                 MESOS_MASTER_HOST = "${MESOS}"
+                MESOS_AGENT = "100.64.176.14"
                 INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
             }
             stages {
