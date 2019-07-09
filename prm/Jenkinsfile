@@ -242,12 +242,10 @@ def reconfigure_wca() {
 }
 
 def start_wca() {
-    '''
-    echo 'Restart wca...'
-    sudo systemctl restart wca
+    print('Starting wca...')
+    sh "sudo systemctl restart wca"
     sleep 5
-    sh 'sudo systemctl status wca'
-    '''
+    sh "sudo systemctl status wca"''
 }
 
 def start_workloads(extra_params, tags, sleep_time) {
@@ -271,8 +269,9 @@ def stop_workloads() {
 }
 
 def stop_wca() {
-    echo 'Stop wca...'
-    sh 'sudo systemctl stop wca'
+    print('Stopping wca...')
+    sh "sudo systemctl stop wca"
+    print('Stopped wca.')
 }
 
 def build_pex() {
