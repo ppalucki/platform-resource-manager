@@ -33,7 +33,7 @@ application_hosts:
               disk: 20
         big:
           # twice as much cores assigned, and 4 times more threads
-          count: 1
+          count: 0
           slo: 5000
           communication_port: 11213
           twemcache:
