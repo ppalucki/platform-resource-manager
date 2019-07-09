@@ -192,8 +192,8 @@ pipeline {
 def clean(scenario, csv_file) {
     stop_workloads()
     sleep 5
-    plot_results(scenario, csv_file)
     stop_wca()
+    sh "sudo rmdir /tmp/db"
 }
 
 def plot_results(scenario, csv_file) {
@@ -245,7 +245,7 @@ def start_wca() {
     print('Starting wca...')
     sh "sudo systemctl restart wca"
     sleep 5
-    sh "sudo systemctl status wca"''
+    sh "sudo systemctl status wca"
 }
 
 def start_workloads(extra_params, tags, sleep_time) {
@@ -302,6 +302,7 @@ def llc_experiment() {
 	echo 'Start contender workload.'
 	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${CONTENDER_TAGS}", "${LLC_CONTENDER_SLEEP}")
     calculate_precision()
+    plot_results(scenario, csv_file)
 }
 
 def memory_bandwidth_experiment() {
@@ -312,6 +313,7 @@ def memory_bandwidth_experiment() {
     echo 'Start contender workload.'
     start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${CONTENDER_TAGS}", "${MBW_CONTENDER_SLEEP}")
     calculate_precision()
+    plot_results(scenario, csv_file)
 }
 
 def get_submodule_commit(submodule_dir) {
