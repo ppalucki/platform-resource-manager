@@ -70,8 +70,8 @@ def test_metrics():
         env_uniq_id = os.environ['MESOS_AGENT'].split('.')[3]
 
     workloads = list()
-    workloads.append(os.environ.get('TAGS').split(','))
-    workloads.append(os.environ.get('CONTENDER_TAGS').split(','))
+    workloads.extend(os.environ.get('TAGS').split(','))
+    workloads.extend(os.environ.get('CONTENDER_TAGS').split(','))
     for workload in workloads:
         tags = dict(build_number=build_number,
                     build_commit=build_commit,
