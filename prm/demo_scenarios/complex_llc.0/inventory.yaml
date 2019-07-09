@@ -87,7 +87,7 @@ application_hosts:
             image_name: cassandra
             image_tag: 3.11.3
             resources:
-              cpu: 30
+              cpu: 5
               ram: 50
               disk: 50
           cassandra_stress:
@@ -96,6 +96,6 @@ application_hosts:
               duration: 1200
               #qps: @TODO in cassandra_stress.aurora
             resources:
-              cpu: 30
+              cpu: 5
               ram: 20
               disk: 50
