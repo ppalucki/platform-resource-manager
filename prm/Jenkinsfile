@@ -52,6 +52,8 @@ pipeline {
                 MESOS_MASTER_HOST = "${MESOS}"
                 MESOS_AGENT = "100.64.176.14"
                 INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
+                WCA_CONFIG='prm/demo_scenarios/common/wca_config_mesos.yml'
+                CRT_PATH=" "
             }
             stages {
                 stage("Prepare aurora cluster") {
@@ -127,6 +129,7 @@ pipeline {
                 KUBERNETES_HOST = "${KUBERNETES}"
                 INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
                 CRT_PATH = "/etc/kubernetes/ssl"
+                WCA_CONFIG='prm/demo_scenarios/common/wca_config_kubernetes.yml'
             }
             stages {
                 stage("Run LLC Metrics Collection | Kubernetes") {
@@ -219,7 +222,7 @@ def plot_results(scenario, csv_file) {
 
 def reconfigure_wca() {
     echo 'Reconfigure wca...'
-    sh 'cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
+    sh 'cp ${WORKSPACE}/${WCA_CONFIG} ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
     sh 'sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca.service /etc/systemd/system/wca.service'
     sh 'sudo systemctl daemon-reload'
     replace_commit()
@@ -229,7 +232,8 @@ def reconfigure_wca() {
                 configs: [
                     fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
                     fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
-                    fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0)],
+                    fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0),
+                    fileContentReplaceItemConfig( search: 'CRT_PATH', replace: "${CRT_PATH}", matchCount: 0)],
                 fileEncoding: 'UTF-8',
                 filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")])
     sh'''
