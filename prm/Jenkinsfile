@@ -50,7 +50,6 @@ pipeline {
             agent {label 'mesos'}
             environment {
                 MESOS_MASTER_HOST = "${MESOS}"
-                MESOS_EXPECTED_TASKS = -1
                 INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
             }
             stages {
@@ -68,8 +67,8 @@ pipeline {
                         environment {
                             SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                             BUILD_SCENARIO = "llc"
+                            MESOS_EXPECTED_TASKS = 3
                             LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
-
                         }
                         steps {
                             llc_metrics_collection()
@@ -85,6 +84,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        MESOS_EXPECTED_TASKS = 4
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -101,6 +101,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+                        MESOS_EXPECTED_TASKS = 4
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -118,7 +119,6 @@ pipeline {
             agent {label 'kubernetes'}
             environment {
                 KUBERNETES_HOST = "${KUBERNETES}"
-                KUBERNETES_EXPECTED_TASKS = -1
                 INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
                 CRT_PATH = "/etc/kubernetes/ssl"
             }
@@ -128,6 +128,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        KUBERNETES_EXPECTED_TASKS = 3
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -144,6 +145,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        KUBERNETES_EXPECTED_TASKS = 4
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -160,6 +162,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
+                        KUBERNETES_EXPECTED_TASKS = 4
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -275,7 +278,6 @@ def llc_metrics_collection() {
     start_wca()
     echo 'Start baseline workloads.'
     start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_COLLECT_SLEEP}")
-    calculate_precision()
 }
 
 def llc_experiment() {
