@@ -24,4 +24,3 @@ runner: !DetectionRunner
     build_commit: "BUILD_COMMIT"
     build_number: "BUILD_NUMBER"
     build_scenario: "BUILD_SCENARIO"
-    

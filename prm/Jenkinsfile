@@ -68,6 +68,7 @@ pipeline {
                             SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                             BUILD_SCENARIO = "llc"
                             MESOS_EXPECTED_TASKS = 3
+                            TAGS='twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra'
                             LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                         }
                         steps {
@@ -85,6 +86,8 @@ pipeline {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                         MESOS_EXPECTED_TASKS = 4
+                        TAGS='twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra'
+                        CONTENDER_TAGS='cassandra_stress--stress'
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -102,6 +105,8 @@ pipeline {
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
                         MESOS_EXPECTED_TASKS = 4
+                        TAGS='specjbb,tensorflow_benchmark_train,cassandra_stress'
+                        CONTENDER_TAGS='tensorflow_benchmark_prediction'
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -129,6 +134,7 @@ pipeline {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                         KUBERNETES_EXPECTED_TASKS = 3
+                        TAGS='twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra'
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -146,6 +152,8 @@ pipeline {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
                         KUBERNETES_EXPECTED_TASKS = 4
+                        TAGS='twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra'
+                        CONTENDER_TAGS='cassandra_stress--stress'
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -163,6 +171,8 @@ pipeline {
                         BUILD_SCENARIO = "mbw"
                         SCENARIO_INVENTORY='prm/demo_scenarios/complex_mbw.0/inventory.yaml'
                         KUBERNETES_EXPECTED_TASKS = 4
+                        TAGS='specjbb,tensorflow_benchmark_train,cassandra_stress'
+                        CONTENDER_TAGS='tensorflow_benchmark_prediction'
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -277,7 +287,7 @@ def llc_metrics_collection() {
     reconfigure_wca()
     start_wca()
     echo 'Start baseline workloads.'
-    start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_COLLECT_SLEEP}")
+    start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${TAGS}", "${LLC_COLLECT_SLEEP}")
 }
 
 def llc_experiment() {
@@ -289,9 +299,9 @@ def llc_experiment() {
         sh 'sed -i s/-C\\ %d\\;/-C\\ %d\\ -R\\ 2000\\;/g ./mutilate/mutilate.aurora'
     }
     echo 'Start baseline workloads.'
-	start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra', "${LLC_BASELINE_SLEEP}")
+	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${TAGS}", "${LLC_BASELINE_SLEEP}")
 	echo 'Start contender workload.'
-	start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'cassandra_stress--stress', "${LLC_CONTENDER_SLEEP}")
+	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${CONTENDER_TAGS}", "${LLC_CONTENDER_SLEEP}")
     calculate_precision()
 }
 
@@ -299,9 +309,9 @@ def memory_bandwidth_experiment() {
     reconfigure_wca()
     start_wca()
     echo 'Start baseline workloads.'
-    start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'specjbb,tensorflow_benchmark_train,cassandra_stress', "${MBW_BASELINE_SLEEP}")
+    start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${TAGS}", "${MBW_BASELINE_SLEEP}")
     echo 'Start contender workload.'
-    start_workloads("${EXTRA_ANSIBLE_PARAMS}", 'tensorflow_benchmark_prediction', "${MBW_CONTENDER_SLEEP}")
+    start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${CONTENDER_TAGS}", "${MBW_CONTENDER_SLEEP}")
     calculate_precision()
 }
 
