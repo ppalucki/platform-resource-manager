@@ -82,6 +82,9 @@ def test_metrics():
         sli_metrics = fetch_metrics(sli_query)
         assert len(sli_metrics['data']['result']) > 0
 
+        tags = dict(build_number=build_number,
+                    build_commit=build_commit,
+                    env_uniq_id=env_uniq_id)
         anomaly_count_query = build_prometheus_url(prometheus, 'anomaly_count',
                                                    tags, 600, time())
         anomaly_count_metrics = fetch_metrics(anomaly_count_query)
