@@ -8,9 +8,9 @@ pipeline {
         PROMETHEUS='http://100.64.176.12:9090' 
         MESOS='100.64.176.23'
         KUBERNETES='100.64.176.34'
-        LLC_BASELINE_SLEEP = 300
+        LLC_BASELINE_SLEEP = 180
         LLC_COLLECT_SLEEP = 36000
-        LLC_CONTENDER_SLEEP = 300
+        LLC_CONTENDER_SLEEP = 180
         MBW_BASELINE_SLEEP = 5
         MBW_CONTENDER_SLEEP = 5
         BUILD_COMMIT = "${GIT_COMMIT}"
@@ -79,7 +79,7 @@ pipeline {
                         }
                         post {
                             always {
-                                clean("LLC", "llc_results.csv")
+                                clean()
                             }
                         }
                 }
@@ -98,7 +98,7 @@ pipeline {
                     }
                     post {
                         always {
-                            clean("LLC", "llc_results.csv")
+                            clean()
                         }
                     }
                 }
@@ -184,7 +184,7 @@ pipeline {
                     }
                     post {
                         always {
-                            clean("MBW", "mbw_results.csv")
+                            clean()
                         }
                     }
                 }
@@ -193,10 +193,11 @@ pipeline {
     }
 }
 
-def clean(scenario, csv_file) {
+def clean() {
     stop_workloads()
     sleep 5
     stop_wca()
+    sh "sudo rmdir ${WORKSPACE}/${BUILD_NUMBER}"
 }
 
 def plot_results(scenario, csv_file) {
@@ -307,7 +308,7 @@ def llc_experiment() {
 	echo 'Start contender workload.'
 	start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${CONTENDER_TAGS}", "${LLC_CONTENDER_SLEEP}")
     calculate_precision()
-    plot_results(scenario, csv_file)
+    plot_results("LLC", "llc_results.csv")
 }
 
 def memory_bandwidth_experiment() {
@@ -318,7 +319,7 @@ def memory_bandwidth_experiment() {
     echo 'Start contender workload.'
     start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${CONTENDER_TAGS}", "${MBW_CONTENDER_SLEEP}")
     calculate_precision()
-    plot_results(scenario, csv_file)
+    plot_results("MBW", "mbw_results.csv")
 }
 
 def get_submodule_commit(submodule_dir) {
