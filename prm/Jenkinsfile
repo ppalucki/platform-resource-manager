@@ -197,7 +197,7 @@ def clean(scenario, csv_file) {
     stop_workloads()
     sleep 5
     stop_wca()
-    sh "sudo rmdir /tmp/db"
+    sh "sudo rmdir ${WORKSPACE}/${BUILD_NUMBER}"
 }
 
 def plot_results(scenario, csv_file) {
@@ -233,7 +233,8 @@ def reconfigure_wca() {
                     fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
                     fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
                     fileContentReplaceItemConfig( search: 'BUILD_SCENARIO', replace: "${BUILD_SCENARIO}", matchCount: 0),
-                    fileContentReplaceItemConfig( search: 'CRT_PATH', replace: "${CRT_PATH}", matchCount: 0)],
+                    fileContentReplaceItemConfig( search: 'CRT_PATH', replace: "${CRT_PATH}", matchCount: 0),
+                    fileContentReplaceItemConfig( search: 'WORKSPACE', replace: "${WORKSPACE}", matchCount: 0)],
                 fileEncoding: 'UTF-8',
                 filePath: "${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp")])
     sh'''
