@@ -197,7 +197,6 @@ def clean(scenario, csv_file) {
     stop_workloads()
     sleep 5
     stop_wca()
-    sh "sudo rmdir ${WORKSPACE}/${BUILD_NUMBER}"
 }
 
 def plot_results(scenario, csv_file) {
