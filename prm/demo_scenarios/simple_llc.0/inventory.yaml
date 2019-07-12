@@ -36,6 +36,7 @@ application_hosts:
           count: 1
           timeout: 60
           stressor: cache
+          slo: inf
           number_workers: 16
           resources:
             cpu: 16
