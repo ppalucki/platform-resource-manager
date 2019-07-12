@@ -1,0 +1,45 @@
+# @Scenario LLC contention:
+# 3 redis instances;
+# 3 twemcached instances (one big instance with big workload, other two relatively small);
+# start cassandra service but no workload to train the model;
+# start the cassandra stressor to test the model for cache contention.
+
+application_hosts:
+  vars:
+    workloads:
+      twemcache_mutilate:
+        default:
+          count: 1
+          slo: 1000
+          communication_port: 11211
+          twemcache:
+            env:
+              worker_threads: 6
+              max_memory: 4096
+            resources:
+              cpu: 6
+              ram: 50
+              disk: 50
+          mutilate:
+            env:
+              sli_percentile: 95    # Note: 99 percentile is too sensitive
+              threads: 8
+              connections: 16      # originally was 1, but that seems to be too small
+              warmup_time: 10
+              qps: 200000            # that's original value (40k)
+            resources:
+              cpu: 8
+              ram: 10
+              disk: 20
+      stress_ng:
+        default:
+          count: 1
+          stress_ng:
+            env:
+              timeout: 60
+              stressor: cache
+              number_workers: 16
+            resources:
+              cpu: 16
+              ram: 50
+              disk: 50
