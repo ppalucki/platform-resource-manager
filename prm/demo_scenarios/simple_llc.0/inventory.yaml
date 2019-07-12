@@ -34,12 +34,10 @@ application_hosts:
       stress_ng:
         default:
           count: 1
-          stress_ng:
-            env:
-              timeout: 60
-              stressor: cache
-              number_workers: 16
-            resources:
-              cpu: 16
-              ram: 50
-              disk: 50
+          timeout: 60
+          stressor: cache
+          number_workers: 16
+          resources:
+            cpu: 16
+            ram: 50
+            disk: 50
