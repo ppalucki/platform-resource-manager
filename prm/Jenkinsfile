@@ -87,7 +87,7 @@ pipeline {
                     when { expression { return params.LLC } }
                     environment {
                         BUILD_SCENARIO = "llc"
-                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        SCENARIO_INVENTORY='prm/demo_scenarios/simple_llc.0/inventory.yaml'
                         MESOS_EXPECTED_TASKS = 2
                         TAGS='twemcache_mutilate'
                         CONTENDER_TAGS='stress_ng'
