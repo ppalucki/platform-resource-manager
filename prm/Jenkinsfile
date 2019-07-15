@@ -70,7 +70,7 @@ pipeline {
                         environment {
                             SCENARIO_INVENTORY='prm/demo_scenarios/simple_llc.0/inventory.yaml'
                             BUILD_SCENARIO = "llc"
-                            MESOS_EXPECTED_TASKS = 1
+                            MESOS_EXPECTED_TASKS = 2
                             TAGS='twemcache_mutilate'
                             LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                         }
@@ -88,7 +88,7 @@ pipeline {
                     environment {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/simple_llc.0/inventory.yaml'
-                        MESOS_EXPECTED_TASKS = 2
+                        MESOS_EXPECTED_TASKS = 3
                         TAGS='twemcache_mutilate'
                         CONTENDER_TAGS='stress_ng'
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
@@ -136,9 +136,9 @@ pipeline {
                     when { expression { return params.BUILD_LLC_MODEL } }
                     environment {
                         BUILD_SCENARIO = "llc"
-                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
-                        KUBERNETES_EXPECTED_TASKS = 3
-                        TAGS='twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra'
+                        SCENARIO_INVENTORY='prm/demo_scenarios/simple_llc.0/inventory.yaml'
+                        KUBERNETES_EXPECTED_TASKS = 2
+                        TAGS='twemcache_mutilate'
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
@@ -154,10 +154,10 @@ pipeline {
                     when { expression { return params.LLC } }
                     environment {
                         BUILD_SCENARIO = "llc"
-                        SCENARIO_INVENTORY='prm/demo_scenarios/complex_llc.0/inventory.yaml'
+                        SCENARIO_INVENTORY='prm/demo_scenarios/simple_llc.0/inventory.yaml'
                         KUBERNETES_EXPECTED_TASKS = 3
-                        TAGS='twemcache_mutilate,redis_rpc_perf,cassandra_stress--cassandra'
-                        CONTENDER_TAGS='cassandra_stress--stress'
+                        TAGS='stress_ng'
+                        CONTENDER_TAGS='stress_ng'
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
                     steps {
