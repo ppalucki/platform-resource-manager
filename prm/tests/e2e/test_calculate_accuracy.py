@@ -67,7 +67,7 @@ def test_metrics():
     if os.environ.get('KUBERNETES_HOST'):
         env_uniq_id = os.environ['KUBERNETES_HOST'].split('.')[3]
     else:
-        env_uniq_id = os.environ['MESOS_AGENT'].split('.')[3]
+        env_uniq_id = os.environ['LOAD_GENERATOR_HOST_IP'].split('.')[3]
 
     workloads = list()
     workloads.extend(os.environ.get('TAGS').split(','))
