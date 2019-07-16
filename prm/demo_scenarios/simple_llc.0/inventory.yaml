@@ -23,12 +23,12 @@ application_hosts:
           mutilate:
             env:
               sli_percentile: 95    # Note: 99 percentile is too sensitive
-              threads: 8
+              threads: 4
               connections: 16      # originally was 1, but that seems to be too small
               warmup_time: 10
               qps: 200000            # that's original value (40k)
             resources:
-              cpu: 8
+              cpu: 4
               ram: 10
               disk: 20
       stress_ng:
@@ -37,8 +37,8 @@ application_hosts:
           timeout: 60
           stressor: cache
           slo: inf
-          number_workers: 16
+          number_workers: 32
           resources:
-            cpu: 16
+            cpu: 32
             ram: 50
             disk: 50
