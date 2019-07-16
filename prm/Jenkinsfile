@@ -51,7 +51,6 @@ pipeline {
             environment {
                 MESOS_MASTER_HOST = "${MESOS}"
                 MESOS_AGENT = "100.64.176.14"
-                LOAD_GENERATOR_HOST_IP = "100.64.176.16"
                 INVENTORY='prm/demo_scenarios/common/inventory-mesos.yaml'
                 WCA_CONFIG='prm/demo_scenarios/common/wca_config_mesos.yml'
                 CRT_PATH=" "
