@@ -33,7 +33,7 @@ application_hosts:
               disk: 20
       stress_ng:
         default:
-          count: 2
+          count: 3
           timeout: 60
           stressor: "cache-level=3 --cache"
           slo: inf
