@@ -33,12 +33,12 @@ application_hosts:
               disk: 20
       stress_ng:
         default:
-          count: 1
+          count: 2
           timeout: 60
-          stressor: cache
+          stressor: "cache-level=3 --cache"
           slo: inf
-          number_workers: 32
+          number_workers: 28
           resources:
-            cpu: 32
+            cpu: 20
             ram: 50
             disk: 50
