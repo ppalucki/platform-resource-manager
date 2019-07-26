@@ -39,6 +39,6 @@ application_hosts:
           slo: inf
           number_workers: 28
           resources:
-            cpu: 20
+            cpu: 16
             ram: 50
             disk: 50
