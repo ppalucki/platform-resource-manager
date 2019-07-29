@@ -14,10 +14,10 @@ application_hosts:
           communication_port: 11211
           twemcache:
             env:
-              worker_threads: 4
+              worker_threads: 6
               max_memory: 4096
             resources:
-              cpu: 4
+              cpu: 6
               ram: 50
               disk: 50
           mutilate:
@@ -33,12 +33,12 @@ application_hosts:
               disk: 20
       stress_ng:
         default:
-          count: 3
+          count: 1
           timeout: 60
           stressor: "cache-level=3 --cache"
           slo: inf
           number_workers: 28
           resources:
-            cpu: 16
+            cpu: 28
             ram: 50
             disk: 50
