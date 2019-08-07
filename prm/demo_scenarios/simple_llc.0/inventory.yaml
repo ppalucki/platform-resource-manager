@@ -10,7 +10,7 @@ application_hosts:
       twemcache_mutilate:
         default:
           count: 1
-          slo: 1000
+          slo: 500
           communication_port: 11211
           twemcache:
             env:
