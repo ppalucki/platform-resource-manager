@@ -336,6 +336,7 @@ class ContentionDetector(detectors.AnomalyDetector):
         if self.agg:
             if self.database and self.cycle == 0:
                 try:
+                    print("cpu_model", platform.cpu_model, sep=' ')
                     threshs = self.database.get(platform.cpu_model)
                     self.threshs = json.loads(threshs)
                     if self.threshs:
