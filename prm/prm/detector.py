@@ -127,6 +127,7 @@ class ContentionDetector(detectors.AnomalyDetector):
 
         cid = con.cid
         thresh = self._get_thresholds(app, ThreshType.METRICS)
+        print(app, ThreshType.METRICS, thresh, sep=' ')
         if thresh:
             contends, wca_metrics = con.contention_detect(thresh)
             log.debug('cid=%r contends=%r', cid, contends)
