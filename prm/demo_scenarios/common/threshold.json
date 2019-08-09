@@ -1,6 +1,6 @@
 {
     "twemcache.default": {
-        "4.0" : {
+        "6.0" : {
             "tdp_threshold" : {},
             "metrics_threshold" : [
                 {
