@@ -197,7 +197,7 @@ def clean() {
     stop_workloads()
     sleep 5
     stop_wca()
-    sh "sudo rmdir -rf ${WORKSPACE}/${BUILD_NUMBER}"
+    sh "sudo rm -rf ${WORKSPACE}/${BUILD_NUMBER}"
 }
 
 def plot_results(scenario, csv_file) {
@@ -240,8 +240,6 @@ def reconfigure_wca() {
     sh'''
     sudo mkdir -p /var/lib/wca/
     sudo mkdir -p /etc/wca
-    sudo mkdir -p ${WORKSPACE}/${BUILD_NUMBER}/
-    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json "${WORKSPACE}/${BUILD_NUMBER}/Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz"
     sudo cp ${WORKSPACE}/prm/demo_scenarios/common/workload.json /var/lib/wca/
     sudo cp ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
     sudo cp ${WORKSPACE}/prm/dist/wca-prm.pex /usr/bin/wca.pex
@@ -314,6 +312,10 @@ def llc_experiment() {
 def memory_bandwidth_experiment() {
     reconfigure_wca()
     start_wca()
+    sleep 10
+    '''
+    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json "${WORKSPACE}/${BUILD_NUMBER}/Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz"
+    '''
     echo 'Start baseline workloads.'
     start_workloads("${EXTRA_ANSIBLE_PARAMS}", "${TAGS}", "${MBW_BASELINE_SLEEP}")
     echo 'Start contender workload.'
