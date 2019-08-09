@@ -252,7 +252,7 @@ def start_wca() {
     sleep 5
     sh "sudo systemctl status wca"
     sh '''
-    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json "${WORKSPACE}/${BUILD_NUMBER}/Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz"
+    sudo cp ${WORKSPACE}/prm/demo_scenarios/common/threshold.json "${WORKSPACE}/${BUILD_NUMBER}/Intel_R__Xeon_R__CPU_E5-2660_v4___2.00GHz"
     '''
 }
 
