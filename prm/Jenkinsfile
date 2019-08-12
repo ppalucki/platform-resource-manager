@@ -9,7 +9,6 @@ pipeline {
         MESOS='100.64.176.23'
         KUBERNETES='100.64.176.34'
         LLC_BASELINE_SLEEP = 600
-        LLC_COLLECT_SLEEP = 36000
         LLC_CONTENDER_SLEEP = 600
         MBW_BASELINE_SLEEP = 5
         MBW_CONTENDER_SLEEP = 5
@@ -24,7 +23,6 @@ pipeline {
     }
     parameters {
         booleanParam(name: 'BUILD_PEX', defaultValue: true, description: 'Build wca-pex')
-        booleanParam(name: 'BUILD_LLC_MODEL', defaultValue: false, description: 'Build Model For LLC Contention')
         booleanParam(name: 'LLC', defaultValue: true, description: 'Run LLC experiment')
         booleanParam(name: 'MB', defaultValue: false, description: 'Run MBW experiment')
     }
@@ -64,24 +62,6 @@ pipeline {
                         cp ${WORKSPACE}/prm/demo_scenarios/common/aurora-clusters.json  ${HOME}/.aurora/clusters.json
                         '''
                     }
-                }
-                stage("Run LLC Metrics Collection | Mesos") {
-                        when { expression { return params.BUILD_LLC_MODEL } }
-                        environment {
-                            SCENARIO_INVENTORY='prm/demo_scenarios/simple_llc.0/inventory.yaml'
-                            BUILD_SCENARIO = "llc"
-                            MESOS_EXPECTED_TASKS = 2
-                            TAGS='twemcache_mutilate'
-                            LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
-                        }
-                        steps {
-                            llc_metrics_collection()
-                        }
-                        post {
-                            always {
-                                clean()
-                            }
-                        }
                 }
                 stage("Run LLC experiment | Mesos") {
                     when { expression { return params.LLC } }
@@ -132,31 +112,13 @@ pipeline {
                 WCA_CONFIG='prm/demo_scenarios/common/wca_config_kubernetes.yml'
             }
             stages {
-                stage("Run LLC Metrics Collection | Kubernetes") {
-                    when { expression { return params.BUILD_LLC_MODEL } }
-                    environment {
-                        BUILD_SCENARIO = "llc"
-                        SCENARIO_INVENTORY='prm/demo_scenarios/simple_llc.0/inventory.yaml'
-                        KUBERNETES_EXPECTED_TASKS = 2
-                        TAGS='twemcache_mutilate'
-                        LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
-                    }
-                    steps {
-                        llc_metrics_collection()
-                    }
-                    post {
-                        always {
-                            clean()
-                        }
-                    }
-                }
                 stage("Run LLC experiment | Kubernetes") {
                     when { expression { return params.LLC } }
                     environment {
                         BUILD_SCENARIO = "llc"
                         SCENARIO_INVENTORY='prm/demo_scenarios/simple_llc.0/inventory.yaml'
                         KUBERNETES_EXPECTED_TASKS = 3
-                        TAGS='stress_ng'
+                        TAGS='twemcache_mutilate'
                         CONTENDER_TAGS='stress_ng'
                         LABELS="""{additional_labels: {build_number: "${BUILD_NUMBER}", build_node_name: "${NODE_NAME}", build_commit: "${GIT_COMMIT}", build_scenario: "$BUILD_SCENARIO"}}"""
                     }
