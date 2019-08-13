@@ -4,8 +4,8 @@
             "tdp_threshold" : {},
             "metrics_threshold" : [
                 {
-                    "util_start": 350.0, 
-                    "util_end": 450.0, 
+                    "util_start": 400.0, 
+                    "util_end": 600.0, 
                     "cpi": 1.25, 
                     "mpki": 0.1, 
                     "mb": 0,
