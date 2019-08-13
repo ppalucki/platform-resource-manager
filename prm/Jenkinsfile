@@ -60,8 +60,8 @@ pipeline {
                         sh'''
                         mkdir -p ${HOME}/.aurora
                         cp ${WORKSPACE}/prm/demo_scenarios/common/aurora-clusters.json  ${HOME}/.aurora/clusters.json
-                        sudo cpupower frequency-set -u 2.0GHz
-                        sudo cpupower frequency-set -d 2.0GHz
+                        sudo cpupower frequency-set -u 3.2GHz
+                        sudo cpupower frequency-set -d 3.2GHz
                         '''
                     }
                 }
