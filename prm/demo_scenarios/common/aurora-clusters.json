@@ -2,9 +2,9 @@
   {
     "auth_mechanism": "UNAUTHENTICATED",
     "name": "example",
-    "scheduler_zk_path": "/aurora-ci/scheduler",
+    "scheduler_zk_path": "/aurora/scheduler",
     "slave_root": "/var/lib/mesos",
     "slave_run_directory": "latest",
-    "zk": "100.64.176.23"
+    "zk": "100.64.176.11"
   }
 ]

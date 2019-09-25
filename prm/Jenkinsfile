@@ -6,7 +6,7 @@ pipeline {
     environment {
         PLAYBOOK='prm/workload-collocation-agent/workloads/run_workloads.yaml'
         PROMETHEUS='http://100.64.176.12:9090' 
-        MESOS='100.64.176.23'
+        MESOS='100.64.176.11'
         KUBERNETES='100.64.176.34'
         LLC_BASELINE_SLEEP = 600
         LLC_CONTENDER_SLEEP = 600
