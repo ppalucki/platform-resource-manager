@@ -112,6 +112,7 @@ pipeline {
                 INVENTORY='prm/demo_scenarios/common/inventory-kubernetes.yaml'
                 CRT_PATH = "/etc/kubernetes/ssl"
                 WCA_CONFIG='prm/demo_scenarios/common/wca_config_kubernetes.yml'
+                KUBECONFIG="${HOME}/admin.conf"
             }
             stages {
                 stage("Run LLC experiment | Kubernetes") {
